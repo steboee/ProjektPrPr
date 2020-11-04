@@ -3,16 +3,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-void function_v(int* subor,FILE** ptr) {
+void function_v(int* pacienti,FILE** ptr) {
 	*ptr = fopen("pacienti.txt", "r");
 	if (*ptr == NULL) {
 		printf("NEPODARILO SA OTVORIT SUBOR");
 		exit(1);
 	}
-	*subor = 1;
 	char buff[100];
 	int pocet_riadkov = 0;
-	int pacienti = 0;
+	*pacienti = 0;
 	for (int i = 1; fgets(buff, sizeof(buff), *ptr) != NULL; i++) { // zistovanie poctu riadkov v zaznamoch
 		pocet_riadkov++;
 	}		
@@ -20,7 +19,7 @@ void function_v(int* subor,FILE** ptr) {
 	int x;
 	x = pocet_riadkov;								//x = lokalna premenna pre nasledujuci for aby nsa zachovala premenná "pocet_riadkov"
 	for (x; x > 0; x = x - 7) {						// zistenie poctu pacientov
-		pacienti++;
+		(*pacienti) = (*pacienti) + 1 ;
 	}
 	
 	int korektnost = 0;
@@ -225,8 +224,7 @@ void function_o(FILE*file) {
 	
 }
 
-
-void function_n(int*subor, FILE* file, char*** pole_meno, char*** pole_rodnecislo, char*** pole_diagnoza, char*** pole_vysetrenie, char*** pole_vysledok, char*** pole_datum) {
+void function_n(FILE* file, char*** pole_meno, char*** pole_rodnecislo, char*** pole_diagnoza, char*** pole_vysetrenie, char*** pole_vysledok, char*** pole_datum) {
 	 
 	if (file == NULL) {
 		printf("Neotvoril sa subor , subor sa otvori stlacením v\n");
@@ -256,37 +254,57 @@ void function_n(int*subor, FILE* file, char*** pole_meno, char*** pole_rodnecisl
 	for (int i = 0; i < pacienti; i++) {
 		(*pole_meno)[i] = calloc(55, sizeof(char));
 		fgets((*pole_meno)[i], 55, file);
+		(*pole_meno)[i][strlen((*pole_meno)[i]) - 1] = '\0';			//na posledne miesto kde je obycajne \n da znak \0
+
 		(*pole_rodnecislo)[i] = calloc(12, sizeof(char));
 		fgets((*pole_rodnecislo)[i], 12, file);
-		(*pole_diagnoza)[i] = calloc(10, sizeof(char));
+		(*pole_rodnecislo)[i][strlen((*pole_rodnecislo)[i]) - 1] = '\0';			//na posledne miesto kde je obycajne \n da znak \0
+
+		(*pole_diagnoza)[i] = calloc(12, sizeof(char));
 		fgets((*pole_diagnoza)[i], 10, file);
+		(*pole_diagnoza)[i][strlen((*pole_diagnoza)[i]) - 1] = '\0';				//na posledne miesto kde je obycajne \n da znak \0
+
 		(*pole_vysetrenie)[i] = calloc(55, sizeof(char));
 		fgets((*pole_vysetrenie)[i], 50, file);
+		(*pole_vysetrenie)[i][strlen((*pole_vysetrenie)[i]) - 1] = '\0';			//na posledne miesto kde je obycajne \n da znak \0
+
 		(*pole_vysledok)[i] = calloc(55, sizeof(char));
 		fgets((*pole_vysledok)[i], 50, file);
+		//(*pole_vysledok)[i][strlen((*pole_vysledok)[i]) - 1] = '\0';				//na posledne miesto kde je obycajne \n da znak \0
+
 		(*pole_datum)[i] = calloc(50, sizeof(char));
 		fgets((*pole_datum)[i], 50, file);
+		(*pole_vysledok)[i][strlen((*pole_vysledok)[i]) - 1] = '\0';				//na posledne miesto kde je obycajne \n da znak \0
+
 		fgets(buff, sizeof(buff), file);
 	}
-	
-	printf("Hello");
-	printf("HEY");
-	
+	printf("------------------- ALOKOVANIE  -------------------\n")
 }
 
-void function_s(FILE*file,char**pole_rodnecislo,char**pole_vysetrenie,char**pole_vysledok) {
+void function_s(FILE*file,char**pole_rodnecislo,char**pole_vysetrenie,char**pole_vysledok,int pacienti) {
 	if (pole_rodnecislo == NULL) {
-		printf("Neboli alokovane dynamicke polia - alokuj stalcenim n\n");
+		printf("Polia niesu Vytvorene - alokuj stalcenim n\n");
 		return;
 	}
-	int vstup;
+	
+	char vstup[12];
 	printf("Nacitaj rodne cislo: ");
-	scanf("%d", &vstup);
-	int pacienti = 0;	// polozky na tomto poradi potom vypisem
-	printf("PACIENTI:%d", pacienti);
+	scanf("%s", &vstup);
+	
+	int position=0;
+	int y = atoi(vstup);
 	for (int i = 0; i < pacienti;i++) {
-		printf("%d", i);
+		int x = atoi(pole_rodnecislo[i]);
+		if (x==y){
+			position = i;
+		}
 	}
+	puts("");
+	printf("------------------- Rodne cislo : %d -------------------\n",vstup);
+	printf("Vysetrenie: %s\n", pole_vysetrenie[position]);
+	printf("Vysledok: %s\n", pole_vysledok[position]);
+	puts("");
+	
 }
 
 
@@ -294,22 +312,20 @@ void function_s(FILE*file,char**pole_rodnecislo,char**pole_vysetrenie,char**pole
 int main() {
 	char input;
 	FILE* file = NULL;
-	int subor = 0;
+	int pacienti = 0;
 	char** pole_meno = NULL, ** pole_rodnecislo = NULL, ** pole_diagnoza = NULL, ** pole_vysetrenie = NULL, ** pole_vysledok = NULL, ** pole_datum = NULL;
-	for (int i = 0;; i) {
-		int pacienti = 0;
-		scanf("%c", &input);
+	while (scanf("%c", &input)) {
 		if (input == 'v') {
-			function_v(&subor, &file);
+			function_v(&pacienti, &file);
 		}
 		if (input == 'o') {
 			function_o(file);
 		}
 		if (input == 'n') {
-			function_n(&subor, file, &pole_meno, &pole_rodnecislo, &pole_diagnoza, &pole_vysetrenie, &pole_vysledok, &pole_datum);
+			function_n(file, &pole_meno, &pole_rodnecislo, &pole_diagnoza, &pole_vysetrenie, &pole_vysledok, &pole_datum);
 		}
 		if (input == 's') {
-			function_s(file,pole_rodnecislo,pole_vysetrenie,pole_vysledok);
+			function_s(file,pole_rodnecislo,pole_vysetrenie,pole_vysledok,pacienti);
 		}
 		if (input == 'k'){
 			exit(1);
