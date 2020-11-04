@@ -124,17 +124,58 @@ function_v(int* subor,FILE** ptr) {
 
 }
 
-void function_o(char*** pole_datum,char***diagnoza) {
-	char buff[100];
+void function_o(FILE*file) {
+	
 	char** pole_datum_o,** pole_diagnoza_o;
 	
+	
+	if (file == NULL) {
+		printf("Nebol otvoreny subor pacienti.txt , otvor stalcenim v\n");
+		return;
+	}
+	char datum[100];
 	printf("Macitaj datum vo formate rrrrmmdd: ");
-	scanf("%s", buff);
-	if (strlen(buff) > 8) {
+	scanf("%s", datum);
+	if (strlen(datum) > 8) {
 		printf("###### - Nekoretny vstup - ######\n");
 		return;
 	}
+	
+	char buff[100];
+	int pocet_riadkov = 0;
+	int pacienti = 0;
+	fseek(file, 0, SEEK_SET);
+	
+	for (int i = 1; fgets(buff, sizeof(buff), file) != NULL; i++) { // zistovanie poctu riadkov v zaznamoch
+		pocet_riadkov++;
+	}
+	fseek(file, 0, SEEK_SET);					 // nastavenie sa v subore na zaciatok.
+	int x;
+	x = pocet_riadkov;								//x = lokalna premenna pre nasledujuci for aby nsa zachovala premenná "pocet_riadkov"
+	for (x; x > 0; x = x - 7) {						// zistenie poctu pacientov
+		pacienti++;
+	}
+	printf("hej");
+	pole_diagnoza_o = calloc(pacienti, sizeof(char*));
+	pole_datum_o = calloc(pacienti, sizeof(char*));
+	int poc = 0;
+	printf("hej");
+	for (int i = 0; i < pacienti; i++) {
+		fgets(buff, sizeof(buff), file);					//Meno priezvisko
+		fgets(buff, sizeof(buff), file);					//Rodne cislo
 
+		pole_diagnoza_o[i] = calloc(50, sizeof(char*));		//Diagnoza
+		fgets(pole_diagnoza_o[i], 50 - 1, file);
+
+		fgets(buff, sizeof(buff), file);					//Vysetrenie
+		fgets(buff, sizeof(buff), file);					//Vysledok
+
+		pole_datum_o[i] = calloc(50, sizeof(char*));		//Datum
+		fgets(pole_datum_o[i], 50 - 1, file);
+		
+		fgets(buff, sizeof(buff), file);					//prazdny riadok za kazdym zaznamom
+	}
+	
 	
 	
 
@@ -224,7 +265,7 @@ int main() {
 			function_v(&subor, &file);
 		}
 		if (input == 'o') {
-			function_o(&pole_datum);
+			function_o(file);
 		}
 		if (input == 'n') {
 			function_n(&subor, file, &pole_meno, &pole_rodnecislo, &pole_diagnoza, &pole_vysetrenie, &pole_vysledok, &pole_datum);
