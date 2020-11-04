@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-function_v(FILE** ptr, int* subor) {
+function_v(int* subor,FILE** ptr) {
 	*ptr = fopen("pacienti.txt", "r");
 	if (*ptr == NULL) {
 		printf("NEPODARILO SA OTVORIT SUBOR");
@@ -16,12 +16,14 @@ function_v(FILE** ptr, int* subor) {
 	for (int i = 1; fgets(buff, sizeof(buff), *ptr) != NULL; i++) { // zistovanie poctu riadkov v zaznamoch
 		pocet_riadkov++;
 	}
-	fseek(*ptr, 1, SEEK_SET);						 // nastavenie sa v subore na zaciatok.
+	//fseek(*ptr, 0, SEEK_SET);		
+	rewind(*ptr);			// nastavenie sa v subore na zaciatok.
 	int x;
 	x = pocet_riadkov;								//x = lokalna premenna pre nasledujuci for aby nsa zachovala premenná "pocet_riadkov"
 	for (x; x > 0; x = x - 7) {						// zistenie poctu pacientov
 		pacienti++;
 	}
+	
 	int korektnost = 0;
 	int pocitadlo = 0;
 	printf("\n------------------- ZACIATOK ZAZNAMOV -------------------\n\n");
@@ -34,7 +36,7 @@ function_v(FILE** ptr, int* subor) {
 				korektnost++;
 			}
 			else {
-				for (int i = 0; i < strlen(buff) - 1; i++) {
+				for (int i = 0; i < (int)strlen(buff) - 1; i++) {
 					if ('A' <= buff[i] && buff[i] <= 'Z' || 'a' <= buff[i] && buff[i] <= 'z' || buff[i] == ' ') {
 						continue;
 					}
@@ -122,15 +124,19 @@ function_v(FILE** ptr, int* subor) {
 
 }
 
-void function_o(char*** pole_datum) {
+void function_o(char*** pole_datum,char***diagnoza) {
 	char buff[100];
-	printf("%s", ((*pole_datum)[1]));
+	char** pole_datum_o,** pole_diagnoza_o;
+	
+	printf("Macitaj datum vo formate rrrrmmdd: ");
 	scanf("%s", buff);
 	if (strlen(buff) > 8) {
 		printf("###### - Nekoretny vstup - ######\n");
 		return;
 	}
-	return;
+
+	
+	
 
 
 }
@@ -139,54 +145,67 @@ void function_o(char*** pole_datum) {
 
 
 
-void function_n(int*subor, FILE** file, char*** pole_meno, char*** pole_rodnecislo, char*** pole_diagnoza, char*** pole_vysetrenie, char*** pole_vysledok, char*** pole_datum) {
+void function_n(int*subor, FILE* file, char*** pole_meno, char*** pole_rodnecislo, char*** pole_diagnoza, char*** pole_vysetrenie, char*** pole_vysledok, char*** pole_datum) {
 
-	if (*file == 0) {
-		printf("Neotovirl sa subor");
+	if (file == NULL) {
+		printf("Neotovirl sa subor , subor sa otvori stlacením v\n");
 		return;
 	}
-
-
-	else {
-		char buff[100];
-		printf("%s", fgets(buff, sizeof(buff), *file));
-		printf("OTvoril sa");
-		int pocet_riadkov = 0;
-		int pacienti = 0;
-		for (int i = 1; fgets(buff, sizeof(buff), *file) != NULL; i++) { // zistovanie poctu riadkov v zaznamoch
-			pocet_riadkov++;
-		}
-		fseek(*file, 1, SEEK_SET);						 // nastavenie sa v subore na zaciatok.
-		int x;
-		x = pocet_riadkov;								//x = lokalna premenna pre nasledujuci for aby nsa zachovala premenná "pocet_riadkov"
-		for (x; x > 0; x = x - 7) {						// zistenie poctu pacientov
-			pacienti++;
-		}
-		printf("HAL");
-		*pole_meno = calloc(pacienti, sizeof(char*));
-		*pole_rodnecislo = calloc(pacienti, sizeof(char*));
-		*pole_diagnoza = calloc(pacienti, sizeof(char*));
-		*pole_vysetrenie = calloc(pacienti, sizeof(char*));
-		*pole_vysledok = calloc(pacienti, sizeof(char*));
-		*pole_datum = calloc(pacienti, sizeof(char*));
-
-		for (int i = 0; i < pacienti; i++) {
-			((*pole_meno)[i]) = calloc(100, sizeof(char));
-			fgets((*pole_meno)[i], 100, *file);
-			((*pole_rodnecislo)[i]) = calloc(pacienti, sizeof(char));
-			fgets((*pole_rodnecislo)[i], 50 - 1, *file);
-			(*pole_diagnoza)[i] = calloc(pacienti, sizeof(char));
-			fgets((*pole_diagnoza)[i], 50 - 1, *file);
-			(*pole_vysetrenie)[i] = calloc(pacienti, sizeof(char));
-			fgets((*pole_vysetrenie)[i], 50 - 1, *file);
-			(*pole_vysledok)[i] = calloc(pacienti, sizeof(char));
-			fgets((*pole_vysledok)[i], 50 - 1, *file);
-			(*pole_datum)[i] = calloc(pacienti, sizeof(char));
-			fgets((*pole_datum)[i], 50 - 1, *file);
-			fgets(buff, sizeof(buff), *file);
-			printf("Helloooo");
-		}
+	char buff[100];
+	int pocet_riadkov = 0;
+	int pacienti = 0;
+	fseek(file, 0, SEEK_SET);
+	for (int i = 1; fgets(buff, sizeof(buff), file) != NULL; i++) { // zistovanie poctu riadkov v zaznamoch
+		pocet_riadkov++;
 	}
+	fseek(file, 0, SEEK_SET);					 // nastavenie sa v subore na zaciatok.
+	int x;
+	x = pocet_riadkov;								//x = lokalna premenna pre nasledujuci for aby nsa zachovala premenná "pocet_riadkov"
+	for (x; x > 0; x = x - 7) {						// zistenie poctu pacientov
+		pacienti++;
+	}
+	printf("%s", buff);
+	printf("OTvoril sa");
+	printf("HAL\n");
+	*pole_meno = calloc(pacienti, sizeof(char*));
+	*pole_rodnecislo = calloc(pacienti, sizeof(char*));
+	*pole_diagnoza = calloc(pacienti, sizeof(char*));
+	*pole_vysetrenie = calloc(pacienti, sizeof(char*));
+	*pole_vysledok = calloc(pacienti, sizeof(char*));
+	*pole_datum = calloc(pacienti, sizeof(char*));
+	printf("Haloo\n");
+
+	for (int i = 0; i < pacienti; i++) {
+		(*pole_meno)[i] = calloc(100, sizeof(char));
+		fgets((*pole_meno)[i], 100, file);
+		(*pole_rodnecislo)[i] = calloc(pacienti, sizeof(char));
+		fgets((*pole_rodnecislo)[i], 50 - 1, file);
+		(*pole_diagnoza)[i] = calloc(pacienti, sizeof(char));
+		fgets((*pole_diagnoza)[i], 50 - 1, file);
+		(*pole_vysetrenie)[i] = calloc(pacienti, sizeof(char));
+		fgets((*pole_vysetrenie)[i], 50 - 1, file);
+		(*pole_vysledok)[i] = calloc(pacienti, sizeof(char));
+		fgets((*pole_vysledok)[i], 50 - 1, file);
+		(*pole_datum)[i] = calloc(pacienti, sizeof(char));
+		fgets((*pole_datum)[i], 50 - 1, file);
+		fgets(buff, sizeof(buff), file);
+		printf("Helloooo");
+	}
+	printf("HEY");
+	//free(*pole_meno);
+	//free(*pole_rodnecislo);
+	//free(*pole_diagnoza);
+	//free(*pole_vysledok);
+	//free(*pole_vysetrenie);
+	//free(*pole_datum);
+	
+	
+
+	
+		
+	
+	
+	
 
 
 
@@ -196,7 +215,7 @@ void function_n(int*subor, FILE** file, char*** pole_meno, char*** pole_rodnecis
 
 int main() {
 	char input;
-	FILE* file;
+	FILE* file = NULL;
 	int subor = 0;
 	char** pole_meno, ** pole_rodnecislo, ** pole_diagnoza, ** pole_vysetrenie, ** pole_vysledok, ** pole_datum;
 	for (int i = 0;; i) {
@@ -208,11 +227,11 @@ int main() {
 			function_o(&pole_datum);
 		}
 		if (input == 'n') {
-			function_n(&subor, &file, &pole_meno, &pole_rodnecislo, &pole_diagnoza, &pole_vysetrenie, &pole_vysledok, &pole_datum);
+			function_n(&subor, file, &pole_meno, &pole_rodnecislo, &pole_diagnoza, &pole_vysetrenie, &pole_vysledok, &pole_datum);
 		}
-		else {
-			continue;
+		if (input == 'k'){
+			exit(1);
 		}
 	}
-	exit(1);
+	
 }
