@@ -3,6 +3,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+
+int in(char** arr, int len, char* target) {
+	int i;
+	for (i = 0; i < len; i++) {
+		if (strncmp(arr[i], target, strlen(target)) == 0) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
 void function_v(int* pacienti,FILE** ptr) {
 	*ptr = fopen("pacienti.txt", "r");
 	if (*ptr == NULL) {
@@ -27,6 +39,7 @@ void function_v(int* pacienti,FILE** ptr) {
 	printf("\n------------------- ZACIATOK ZAZNAMOV -------------------\n\n");
 	for (int i = 1; i <= pocet_riadkov; i++) {
 		fgets(buff, sizeof(buff), *ptr);
+		//MENO PRIEZVISKO
 		if (i == 1 + 7 * pocitadlo) {
 			printf("Meno prizevisko: %s", buff);
 			if (strlen(buff) - 1 > 50) {					// Meno priezvisko moze byt najviac 50 znakovy retazec	
@@ -45,7 +58,7 @@ void function_v(int* pacienti,FILE** ptr) {
 				}
 			}
 		}
-
+		//RODNE CISLO
 		else if (i == 2 + 7 * pocitadlo) {
 			printf("Rodne cislo: %s", buff);
 			long long cislo = atoll(buff);				// Vytvorenie long long zo stringu
@@ -59,6 +72,7 @@ void function_v(int* pacienti,FILE** ptr) {
 			}
 
 		}
+		//DIAGNOZA
 		else if (i == 3 + 7 * pocitadlo) {
 			printf("Diagnoza: %s", buff);
 			int dia = atoi(buff);
@@ -76,6 +90,7 @@ void function_v(int* pacienti,FILE** ptr) {
 			}
 
 		}
+		//VYSETRENIE
 		else if (i == 4 + 7 * pocitadlo) {
 			printf("Vysetrenie: %s", buff);
 			if (strlen(buff) - 1 > 50) {
@@ -83,13 +98,15 @@ void function_v(int* pacienti,FILE** ptr) {
 				korektnost++;
 			}
 		}
+		//VYSLEDOK
 		else if (i == 5 + 7 * pocitadlo) {
 			printf("Vysledok: %s", buff);
-			if (atoi(buff) >= 1000) {
+			if (atoi(buff) > 1000) {
 				printf("###### - Nekorektne zadany vstup Vysledok - #######\n\n");
 				korektnost++;
 			}
 		}
+		//DATUM
 		else if (i == 6 + 7 * pocitadlo) {
 			printf("Datum: %s", buff);
 			if (strlen(buff) > 9) {					// string ma na konci este jeden znak okrem toho co je v.txt preto 9
@@ -195,11 +212,20 @@ void function_o(FILE*file) {
 	int position = 0;
 	for (int i = 0; i < pacienti; i++) {
 		if (inputdate > atoi(pole_datum_o[i])) {
-			pole_DATES[position] = pole_datum_o[i];
-			pole_DIAGNOSIS[position] = pole_diagnoza_o[i];
-			position++;
+			printf("%s", pole_DIAGNOSIS[i]);
+			if (in(pole_DIAGNOSIS, sizeof(pole_DIAGNOSIS), pole_diagnoza_o[i])) {				// funkcia in (zisti ci prvok sa nachazda v pole_DIAGNOSIS)
+				continue;
+			}
+			else {
+				pole_DIAGNOSIS[position] = pole_diagnoza_o[i];
+				position++;
+				
+			}
+			printf("%s", pole_DIAGNOSIS[i]);
+		
 		}
 	}
+
 	
 	for (int j = 0; j < pocet_mensich_datumov; j++) {
 		int count = 0;
@@ -208,16 +234,15 @@ void function_o(FILE*file) {
 				count++;
 
 			}
-			else {
-			}
+			
 		}
 		char number_str[100];
 		sprintf(number_str, "%d", count);
-		printf("%s\n", number_str);
+		//printf("%s\n", number_str);
 		pole_DIAGNOSIS[j] = number_str;
 		
 	}
-	printf("%s", pole_DIAGNOSIS[1]);
+	//printf("%s", pole_DIAGNOSIS[1]);
 	
 	
 	
@@ -258,7 +283,7 @@ void function_n(FILE* file, char*** pole_meno, char*** pole_rodnecislo, char*** 
 
 		(*pole_rodnecislo)[i] = calloc(12, sizeof(char));
 		fgets((*pole_rodnecislo)[i], 12, file);
-		(*pole_rodnecislo)[i][strlen((*pole_rodnecislo)[i]) - 1] = '\0';			//na posledne miesto kde je obycajne \n da znak \0
+		(*pole_rodnecislo)[i][strlen((*pole_rodnecislo)[i]) -1 ] = '\0';			//na posledne miesto kde je obycajne \n da znak \0
 
 		(*pole_diagnoza)[i] = calloc(12, sizeof(char));
 		fgets((*pole_diagnoza)[i], 10, file);
@@ -278,36 +303,55 @@ void function_n(FILE* file, char*** pole_meno, char*** pole_rodnecislo, char*** 
 
 		fgets(buff, sizeof(buff), file);
 	}
-	printf("------------------- ALOKOVANIE  -------------------\n")
+	puts("");
+	printf("------------------- ALOKOVANIE POLI ZACALO -------------------\n");
+	printf("------------------- ALOKOVANIE POLI UKONCILO -------------------\n");
+	puts("");
 }
 
-void function_s(FILE*file,char**pole_rodnecislo,char**pole_vysetrenie,char**pole_vysledok,int pacienti) {
+void function_s(char**pole_rodnecislo,char**pole_vysetrenie,char**pole_vysledok,int pacienti) {
+	if (pole_rodnecislo == NULL) {										//KONTROLA
+		printf("Polia niesu Vytvorene - alokuj stalcenim n\n");
+		return;
+	}
+	puts("");
+	printf("------------------- FUNKCIA S  -------------------\n");
+	char vstup[12];												//lokalny string pre vstup
+	printf("Nacitaj rodne cislo: ");
+	scanf("%s", &vstup);
+	int position = -1;											// Pre pripad zeby sa rodne cislo nenaslo v zozname
+	for (int i = 0; i < pacienti;i++) {
+		printf("%s\n", vstup);
+		printf("%s\n",pole_rodnecislo[i]);
+		if (strncmp(vstup,pole_rodnecislo[i],10)==0){			// strncmp porovnava 2 stringy po znaku (10 prvych znakov skontroluje)
+			position = i;										// nastav position na momentalnu poziciu ----> i
+		}
+
+	}
+	if (position == -1) {										// Ak sa nenajde rodne cislo v zozname
+		printf("Pacient s rodnym cislo: %s nie je v zozname!!\n", vstup);
+		return;
+	}
+	//VYPIS
+	puts("");
+	printf("Rodne cislo : %s\n",vstup);
+	printf("Vysetrenie: %s\n", pole_vysetrenie[position]);
+	printf("Vysledok: %s\n", pole_vysledok[position]);
+	puts("");
+	printf("------------------- FUNKCIA S  -------------------\n");
+	puts("");
+	
+}
+
+void function_h(char** pole_rodnecislo) {
 	if (pole_rodnecislo == NULL) {
 		printf("Polia niesu Vytvorene - alokuj stalcenim n\n");
 		return;
 	}
-	
-	char vstup[12];
-	printf("Nacitaj rodne cislo: ");
-	scanf("%s", &vstup);
-	
-	int position=0;
-	int y = atoi(vstup);
-	for (int i = 0; i < pacienti;i++) {
-		int x = atoi(pole_rodnecislo[i]);
-		if (x==y){
-			position = i;
-		}
-	}
-	puts("");
-	printf("------------------- Rodne cislo : %d -------------------\n",vstup);
-	printf("Vysetrenie: %s\n", pole_vysetrenie[position]);
-	printf("Vysledok: %s\n", pole_vysledok[position]);
-	puts("");
-	
+	char diagnoza[4];
+	scanf("%s", &diagnoza);
+
 }
-
-
 
 int main() {
 	char input;
@@ -325,7 +369,10 @@ int main() {
 			function_n(file, &pole_meno, &pole_rodnecislo, &pole_diagnoza, &pole_vysetrenie, &pole_vysledok, &pole_datum);
 		}
 		if (input == 's') {
-			function_s(file,pole_rodnecislo,pole_vysetrenie,pole_vysledok,pacienti);
+			function_s(pole_rodnecislo,pole_vysetrenie,pole_vysledok,pacienti);
+		}
+		if (input == 'h') {
+			function_h(pole_rodnecislo);
 		}
 		if (input == 'k'){
 			exit(1);
