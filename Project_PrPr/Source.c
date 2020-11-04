@@ -139,9 +139,9 @@ void function_o(char*** pole_datum) {
 
 
 
-void function_n(int* subor, FILE** file, char*** pole_meno, char*** pole_rodnecislo, char*** pole_diagnoza, char*** pole_vysetrenie, char*** pole_vysledok, char*** pole_datum) {
+void function_n(int*subor, FILE** file, char*** pole_meno, char*** pole_rodnecislo, char*** pole_diagnoza, char*** pole_vysetrenie, char*** pole_vysledok, char*** pole_datum) {
 
-	if (*subor == 0) {
+	if (*file == 0) {
 		printf("Neotovirl sa subor");
 		return;
 	}
