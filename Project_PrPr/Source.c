@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define todaydate 2020;
 
-//dotatocna funkcia pre funkciu o
 int in(char** arr, int len, char* target) {
 	int i;
 	for (i = 0; i < len; i++) {
@@ -14,6 +14,9 @@ int in(char** arr, int len, char* target) {
 	}
 	return 0;
 }
+
+
+
 
 //VYPIS ZO SUBORU
 void function_v(int* pacienti,FILE** ptr) {
@@ -143,18 +146,20 @@ void function_v(int* pacienti,FILE** ptr) {
 
 //NAJCASTEJSIA DIAGNOZA
 void function_o(FILE*file) {
-	printf("HELLO");
 	if (file == NULL) {
 		printf("Nebol otvoreny subor pacienti.txt , otvor stalcenim v\n");
 		return;
 	}
+	
 	char inputdatum[100];
 	printf("Nacitaj datum vo formate rrrrmmdd: ");
 	scanf("%s", inputdatum);
+	
 	if (strlen(inputdatum) > 8) {
 		printf("###### - Nekoretny vstup - ######\n");
 		return;
 	}
+	
 	
 	char buff[100];
 	int pocet_riadkov = 0;
@@ -175,8 +180,6 @@ void function_o(FILE*file) {
 		pacienti++;
 	}
 
-
-
 	//ALOKUJ premenné datumov a diagnoz
 	char** pole_datum_o, ** pole_diagnoza_o;
 
@@ -188,108 +191,86 @@ void function_o(FILE*file) {
 		fgets(buff, sizeof(buff), file);					//Meno priezvisko
 		fgets(buff, sizeof(buff), file);					//Rodne cislo
 
-		pole_diagnoza_o[i] = calloc(50, sizeof(char*));		//Diagnoza
+		pole_diagnoza_o[i] = calloc(50, sizeof(char));		//Diagnoza
 		fgets(pole_diagnoza_o[i], 50 - 1, file);
-		pole_diagnoza_o[i][strlen(pole_diagnoza_o[i]) - 1] = '\0';
+		pole_diagnoza_o[i][strlen(pole_diagnoza_o[i]) -1] = '\0';
 
 		fgets(buff, sizeof(buff), file);					//Vysetrenie
 		fgets(buff, sizeof(buff), file);					//Vysledok
 
-		pole_datum_o[i] = calloc(50, sizeof(char*));		//Datum
+		pole_datum_o[i] = calloc(50, sizeof(char));		//Datum
 		fgets(pole_datum_o[i], 50 - 1, file);
 		
 		fgets(buff, sizeof(buff), file);					//prazdny riadok za kazdym zaznamom
 	}
 	
+
+	
+
 	
 	//FUNCKIA o ... realne :
 	int inputdate = atoi(inputdatum);		//vlozeny datum daj na int 
 	printf("%d\n", inputdate);
 	
 	
-	char  **pole_DIAGNOSIS,** pole_dia;
-	
-	pole_DIAGNOSIS = calloc(pacienti, sizeof(char*));
-	pole_dia = calloc(pacienti, sizeof(char*));
-	int position = 0,position_dia = 0;
-	
-		for (int i = 0; i < pacienti; i++) {
-		if (inputdate > atoi(pole_datum_o[i])) {
-			pole_DIAGNOSIS[position] = calloc(4,sizeof(char)); 
-			pole_DIAGNOSIS[position] = pole_diagnoza_o[i];		// pole_DIAGNOSIS = vsetky diagnozy pacientov zaznamenane do daneho datumu
-			printf("%s\n", pole_DIAGNOSIS[position]);
-			position++;
-			if (in(pole_dia, sizeof(pole_dia), pole_diagnoza_o[i])) {
-				continue;
-			}
-			else {
-				pole_dia[position_dia] = pole_diagnoza_o[i];
-				position_dia++;
-			}
-		}
-	}
-	for (int i = 0; i < position_dia; i++) {
-		printf("%s ", pole_dia[i]);
-	}
-
-
-
-
-
-
-	/*
-	printf("%s", pole_DIAGNOSIS[1]);
-	
-	for (int i = 0; i < pocet_mensich_datumov; i++) {
-		
-	}
-
-	int position1 = 0;
+	int pocet_mensich_datumov = 0;
 	for (int i = 0; i < pacienti; i++) {
 		if (inputdate > atoi(pole_datum_o[i])) {
-			printf("%s", pole_DIAGNOSIS[i]);
-			if (in(pole_DIAGNOSIS, sizeof(pole_DIAGNOSIS), pole_diagnoza_o[i])) {				// funkcia in (zisti ci prvok sa nachazda v pole_DIAGNOSIS)
-				continue;
+			pocet_mensich_datumov++;
+		}
+	}
+
+	
+	
+	char *pole_diagnozy[4];
+	int pole_pocty[4] = { 0,0,0,0};
+	int pozicia = 0;
+	for (int i = 0; i < pacienti; i++) {
+		for (int j = 0; j < 4;j++) {
+			if (pole_diagnoza_o[i] == pole_diagnozy[j]) {
+				pole_pocty[j]++;
 			}
 			else {
-				pole_DIAGNOSIS[position1] = pole_diagnoza_o[i];					//pole_DIAGNOSIS ---> neopakujúce sa diagnozy 
-																				//pole_diagnoza_o --> pole vsetkych diagnoz (aj sa opakuju)
-				position++;
+				pole_diagnozy[pozicia] = pole_diagnoza_o[i];
+				pole_pocty[pozicia]++;
+				pozicia++;
+				j = 4;
 
 			}
 		}
 	}
-
-	for (int i = 0; i < position; i++) {
-		printf("POLE : %s\n", pole_DIAGNOSIS[i]);
-	}
-	
-	for (int j = 0; j < pocet_mensich_datumov; j++) {
-		int count = 0;
-		for (int i = 0; i < pocet_mensich_datumov; i++) {
-			if (strcmp(pole_DIAGNOSIS[j], pole_DIAGNOSIS[i]) == 0) {
-				count++;
-
-			}
-			
-		}
-		char number_str[100];
-		sprintf(number_str, "%d", count);
-		//printf("%s\n", number_str);
-		pole_DIAGNOSIS[j] = number_str;
+	for (int i = 0; i < 4; i++) {
+		printf("%d %s\n",pole_pocty[i], pole_diagnozy[i]);
 		
 	}
-	//printf("%s", pole_DIAGNOSIS[1]);
 	
+	
+	
+	/*int pozicia_d = 0;
+	for (int i = 0; i < pocet_mensich_datumov; i++) {
+		for (int j = 0; j < pocet_mensich_datumov; j++) {
+			if (strcmp(pole_DIAGNOSIS[i], pole_DIAGNOSIS[j]) == 0) {
+				printf("Zásah");
+				for (int y = 0; y < 4; y++) {
+					if (strcmp(pole_diagnozy[y], pole_DIAGNOSIS[i]) == 0) {
+						dobre++;
+					}
+				}
+				if (dobre == 0) {
+					pole_diagnozy[pozicia_d] = pole_DIAGNOSIS[i];
+					pozicia_d++;
+				}
+				printf("%s", pole_diagnozy[pozicia_d]);
+			}
+		}
+	}
 	*/
-	
-	
 }
 
 
 //ALOKUJE POLIA
 void function_n(FILE* file, char*** pole_meno, char*** pole_rodnecislo, char*** pole_diagnoza, char*** pole_vysetrenie, char*** pole_vysledok, char*** pole_datum) {
-	 
+	
 	if (file == NULL) {
 		printf("Neotvoril sa subor , subor sa otvori stlacením v\n");
 		return;
@@ -307,6 +288,23 @@ void function_n(FILE* file, char*** pole_meno, char*** pole_rodnecislo, char*** 
 	for (x; x > 0; x = x - 7) {						// zistenie poctu pacientov
 		pacienti ++;
 	}
+	if (*pole_meno != NULL) {
+		for (int i = 0; i < pacienti; i++) {
+			free((*pole_meno)[i]);
+			free((*pole_rodnecislo)[i]);
+			free((*pole_diagnoza)[i]);
+			free((*pole_vysetrenie)[i]);
+			free((*pole_vysledok)[i]);
+			free((*pole_datum)[i]);
+		}
+		free(*pole_meno);
+		free(*pole_rodnecislo);
+		free(*pole_diagnoza);
+		free(*pole_vysetrenie);
+		free(*pole_vysledok);
+		free(*pole_datum);
+	}
+	
 	
 	*pole_meno = calloc(pacienti, sizeof(char*));
 	*pole_rodnecislo = calloc(pacienti, sizeof(char*));
@@ -346,29 +344,13 @@ void function_n(FILE* file, char*** pole_meno, char*** pole_rodnecislo, char*** 
 	printf("------------------- ALOKOVANIE POLI ZACALO -------------------\n");
 	printf("------------------- ALOKOVANIE POLI UKONCILO -------------------\n");
 	puts("");
-	for (int i = 0; i < pacienti; i++) {
-		free((*pole_meno)[i]);
-		free((*pole_rodnecislo)[i]);
-		free((*pole_diagnoza)[i]);
-		free((*pole_vysetrenie)[i]);
-		free((*pole_vysledok)[i]);
-		free((*pole_datum)[i]);
-	}
-	free(*pole_meno);
-	free(*pole_rodnecislo);
-	free(*pole_diagnoza);
-	free(*pole_vysetrenie);
-	free(*pole_vysledok);
-	free(*pole_datum);
+	
 }
 
 
 //RODNE CISLO : VYSETRENIE a VYSLEDOK 
 void function_s(char**pole_rodnecislo,char**pole_vysetrenie,char**pole_vysledok,int pacienti) {
-	if (pole_rodnecislo == NULL) {										//KONTROLA
-		printf("Polia niesu Vytvorene - alokuj stalcenim n\n");
-		return;
-	}
+	
 	puts("");
 	printf("------------------- FUNKCIA S  -------------------\n");
 	char vstup[12];												//lokalny string pre vstup
@@ -400,15 +382,48 @@ void function_s(char**pole_rodnecislo,char**pole_vysetrenie,char**pole_vysledok,
 
 
 
-void function_h(char** pole_rodnecislo) {
+
+
+
+
+
+
+
+
+void function_h(char** pole_rodnecislo,int pacienti) {
 	if (pole_rodnecislo == NULL) {
 		printf("Polia niesu Vytvorene - alokuj stalcenim n\n");
 		return;
 	}
 	char *diagnoza[4];
 	scanf("%s", &diagnoza);
+	int* vek = calloc(pacienti, sizeof(int));
+
+	for (int i = 0; i < pacienti; i++) {
+		int desiatky = ((pole_rodnecislo[i])[0] - '0') * 10 + ((pole_rodnecislo[i])[1] - '0') * 1;
+		if (desiatky < 20) {
+			int roknarodenia = 2000 + desiatky;
+			vek[i] = 2020 - roknarodenia;
+		}
+		else {
+			int roknarodenia = 1900 + desiatky;
+			vek[i] = 2020 - roknarodenia;
+		}
+		printf("%d\n", vek[i]);
+	}
+
+
+
+
 
 }
+
+
+
+
+
+
+
 
 int main() {
 	char input;
@@ -429,7 +444,7 @@ int main() {
 			function_s(pole_rodnecislo,pole_vysetrenie,pole_vysledok,pacienti);
 		}
 		if (input == 'h') {
-			function_h(pole_rodnecislo);
+			function_h(pole_rodnecislo,pacienti);
 		}
 		if (input == 'k'){
 			exit(1);
