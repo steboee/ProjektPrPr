@@ -4,7 +4,7 @@
 #include <string.h>
 
 
-
+//dotatocna funkcia pre funkciu o
 int in(char** arr, int len, char* target) {
 	int i;
 	for (i = 0; i < len; i++) {
@@ -15,6 +15,7 @@ int in(char** arr, int len, char* target) {
 	return 0;
 }
 
+//VYPIS ZO SUBORU
 void function_v(int* pacienti,FILE** ptr) {
 	*ptr = fopen("pacienti.txt", "r");
 	if (*ptr == NULL) {
@@ -139,17 +140,16 @@ void function_v(int* pacienti,FILE** ptr) {
 
 }
 
+
+//NAJCASTEJSIA DIAGNOZA
 void function_o(FILE*file) {
-	
-	char** pole_datum_o,** pole_diagnoza_o;
-	
-	
+	printf("HELLO");
 	if (file == NULL) {
 		printf("Nebol otvoreny subor pacienti.txt , otvor stalcenim v\n");
 		return;
 	}
 	char inputdatum[100];
-	printf("Macitaj datum vo formate rrrrmmdd: ");
+	printf("Nacitaj datum vo formate rrrrmmdd: ");
 	scanf("%s", inputdatum);
 	if (strlen(inputdatum) > 8) {
 		printf("###### - Nekoretny vstup - ######\n");
@@ -161,26 +161,36 @@ void function_o(FILE*file) {
 	int pacienti = 0;
 	fseek(file, 0, SEEK_SET);
 	
+	//POCET RIADKOV
 	for (int i = 1; fgets(buff, sizeof(buff), file) != NULL; i++) { // zistovanie poctu riadkov v zaznamoch
 		pocet_riadkov++;
 	}
-	fseek(file, 0, SEEK_SET);					 // nastavenie sa v subore na zaciatok.
-	int x;
-	x = pocet_riadkov;								//x = lokalna premenna pre nasledujuci for aby nsa zachovala premenná "pocet_riadkov"
 	
+	fseek(file, 0, SEEK_SET);	// nastavenie sa v subore na zaciatok.
+	int x;
+	x = pocet_riadkov;		//x = lokalna premenna pre nasledujuci for aby nsa zachovala premenná "pocet_riadkov"
+	
+	//POCET PACIENTOV
 	for (x; x > 0; x = x - 7) {						// zistenie poctu pacientov
 		pacienti++;
 	}
 
+
+
+	//ALOKUJ premenné datumov a diagnoz
+	char** pole_datum_o, ** pole_diagnoza_o;
+
 	pole_diagnoza_o = calloc(pacienti, sizeof(char*));
 	pole_datum_o = calloc(pacienti, sizeof(char*));
 
+	// VLOZENIE DIAGNOZ A DATUMOV DO POLÍ
 	for (int i = 0; i < pacienti; i++) {
 		fgets(buff, sizeof(buff), file);					//Meno priezvisko
 		fgets(buff, sizeof(buff), file);					//Rodne cislo
 
 		pole_diagnoza_o[i] = calloc(50, sizeof(char*));		//Diagnoza
 		fgets(pole_diagnoza_o[i], 50 - 1, file);
+		pole_diagnoza_o[i][strlen(pole_diagnoza_o[i]) - 1] = '\0';
 
 		fgets(buff, sizeof(buff), file);					//Vysetrenie
 		fgets(buff, sizeof(buff), file);					//Vysledok
@@ -191,25 +201,50 @@ void function_o(FILE*file) {
 		fgets(buff, sizeof(buff), file);					//prazdny riadok za kazdym zaznamom
 	}
 	
-	int inputdate = atoi(inputdatum);
+	
+	//FUNCKIA o ... realne :
+	int inputdate = atoi(inputdatum);		//vlozeny datum daj na int 
 	printf("%d\n", inputdate);
 	
-
-	char **pole_DATES, **pole_DIAGNOSIS;
-	int pocet_mensich_datumov = 0;
-	for (int i = 0; i < pacienti; i++) {
+	
+	char  **pole_DIAGNOSIS,** pole_dia;
+	
+	pole_DIAGNOSIS = calloc(pacienti, sizeof(char*));
+	pole_dia = calloc(pacienti, sizeof(char*));
+	int position = 0,position_dia = 0;
+	
+		for (int i = 0; i < pacienti; i++) {
 		if (inputdate > atoi(pole_datum_o[i])) {
-			pocet_mensich_datumov++;
+			pole_DIAGNOSIS[position] = calloc(4,sizeof(char)); 
+			pole_DIAGNOSIS[position] = pole_diagnoza_o[i];		// pole_DIAGNOSIS = vsetky diagnozy pacientov zaznamenane do daneho datumu
+			printf("%s\n", pole_DIAGNOSIS[position]);
+			position++;
+			if (in(pole_dia, sizeof(pole_dia), pole_diagnoza_o[i])) {
+				continue;
+			}
+			else {
+				pole_dia[position_dia] = pole_diagnoza_o[i];
+				position_dia++;
+			}
 		}
 	}
-	pole_DATES = calloc(pocet_mensich_datumov, sizeof(char*));
-	pole_DIAGNOSIS = calloc(pocet_mensich_datumov, sizeof(char*));
-
-	for (int i = 0; i < pocet_mensich_datumov; i++) {
-		pole_DATES[i] = calloc(10, sizeof(char));
-		pole_DIAGNOSIS[i] = calloc(10, sizeof(char));
+	for (int i = 0; i < position_dia; i++) {
+		printf("%s ", pole_dia[i]);
 	}
-	int position = 0;
+
+
+
+
+
+
+	/*
+	printf("%s", pole_DIAGNOSIS[1]);
+	
+	for (int i = 0; i < pocet_mensich_datumov; i++) {
+		
+	}
+
+	int position1 = 0;
 	for (int i = 0; i < pacienti; i++) {
 		if (inputdate > atoi(pole_datum_o[i])) {
 			printf("%s", pole_DIAGNOSIS[i]);
@@ -217,15 +252,17 @@ void function_o(FILE*file) {
 				continue;
 			}
 			else {
-				pole_DIAGNOSIS[position] = pole_diagnoza_o[i];
+				pole_DIAGNOSIS[position1] = pole_diagnoza_o[i];					//pole_DIAGNOSIS ---> neopakujúce sa diagnozy 
+																				//pole_diagnoza_o --> pole vsetkych diagnoz (aj sa opakuju)
 				position++;
-				
+
 			}
-			printf("%s", pole_DIAGNOSIS[i]);
-		
 		}
 	}
 
+	for (int i = 0; i < position; i++) {
+		printf("POLE : %s\n", pole_DIAGNOSIS[i]);
+	}
 	
 	for (int j = 0; j < pocet_mensich_datumov; j++) {
 		int count = 0;
@@ -244,11 +281,13 @@ void function_o(FILE*file) {
 	}
 	//printf("%s", pole_DIAGNOSIS[1]);
 	
-	
+	*/
 	
 	
 }
 
+
+//ALOKUJE POLIA
 void function_n(FILE* file, char*** pole_meno, char*** pole_rodnecislo, char*** pole_diagnoza, char*** pole_vysetrenie, char*** pole_vysledok, char*** pole_datum) {
 	 
 	if (file == NULL) {
@@ -307,8 +346,24 @@ void function_n(FILE* file, char*** pole_meno, char*** pole_rodnecislo, char*** 
 	printf("------------------- ALOKOVANIE POLI ZACALO -------------------\n");
 	printf("------------------- ALOKOVANIE POLI UKONCILO -------------------\n");
 	puts("");
+	for (int i = 0; i < pacienti; i++) {
+		free((*pole_meno)[i]);
+		free((*pole_rodnecislo)[i]);
+		free((*pole_diagnoza)[i]);
+		free((*pole_vysetrenie)[i]);
+		free((*pole_vysledok)[i]);
+		free((*pole_datum)[i]);
+	}
+	free(*pole_meno);
+	free(*pole_rodnecislo);
+	free(*pole_diagnoza);
+	free(*pole_vysetrenie);
+	free(*pole_vysledok);
+	free(*pole_datum);
 }
 
+
+//RODNE CISLO : VYSETRENIE a VYSLEDOK 
 void function_s(char**pole_rodnecislo,char**pole_vysetrenie,char**pole_vysledok,int pacienti) {
 	if (pole_rodnecislo == NULL) {										//KONTROLA
 		printf("Polia niesu Vytvorene - alokuj stalcenim n\n");
@@ -343,12 +398,14 @@ void function_s(char**pole_rodnecislo,char**pole_vysetrenie,char**pole_vysledok,
 	
 }
 
+
+
 void function_h(char** pole_rodnecislo) {
 	if (pole_rodnecislo == NULL) {
 		printf("Polia niesu Vytvorene - alokuj stalcenim n\n");
 		return;
 	}
-	char diagnoza[4];
+	char *diagnoza[4];
 	scanf("%s", &diagnoza);
 
 }
