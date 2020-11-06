@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define todaydate 2020;
+
 
 int in(char** arr, int len, char* target) {
 	int i;
@@ -144,27 +144,6 @@ void function_v(int* pacienti,FILE** ptr) {
 }
 
 
-MostRepeatable(char** string) {
-	int dlzka = 29;
-	int max = 0;
-	int pocet[100] = { 0 };
-	char* str[5];
-	for (int i = 0; i < dlzka; i++) {
-		for (int j = 0; j < dlzka; j++) {
-			if (strcmp(string[i],string[j]) == 0) {
-				pocet[i]++;
-			}
-		}
-		if ((int)pocet[i] > max) {
-			max = pocet[i];
-			*str = string[i];
-		}
-		printf("%d\n", pocet[i]);
-
-	}
-	printf("TOTO JE %d %s \n", max, *str);
-
-}
 
 //NAJCASTEJSIA DIAGNOZA
 void function_o(FILE*file) {
@@ -232,15 +211,12 @@ void function_o(FILE*file) {
 	
 	//FUNCKIA o ... realne :
 	int inputdate = atoi(inputdatum);		//vlozeny datum daj na int 
-	printf("%d\n", inputdate);
 	char** pole_DIAGNOZY;
 	pole_DIAGNOZY = calloc(pacienti, sizeof(char*));
-	for (int i = 0; i < pacienti; i++) {
+	
 
-	}
-
-	int pocet_mensich_datumov = 0, position = 0;
-	for (int i = 0; i < pacienti; i++) {
+	int pocet_mensich_datumov = 0, position = 0;			
+	for (int i = 0; i < pacienti; i++) {								// ALOKOVALIE POLA DIAGNOZA[i] + zistovanie kolko datumov je mensich ako vstupny
 		if (inputdate > atoi(pole_datum_o[i])) {
 			pole_DIAGNOZY[position] = calloc(5, sizeof(char));
 			pole_DIAGNOZY[position] = pole_diagnoza_o[i];
@@ -248,15 +224,13 @@ void function_o(FILE*file) {
 			pocet_mensich_datumov++;
 		}
 	}
-	for (int i = 0; i < position; i++) {
-		printf("%s\n", pole_DIAGNOZY[i]);
-	}
-	//MostRepeatable(pole_DIAGNOZY);
+	
+	
 	int kolkokrat = 0;
 	int dlzka = 5;
 	int max = 0;
 	int pocet[100] = { 0 };
-	char* str[5];
+	char* str[5] = {""};
 	for (int i = 0; i < pocet_mensich_datumov; i++) {
 		for (int j = 0; j < pocet_mensich_datumov; j++) {
 			if (strcmp(pole_DIAGNOZY[i],pole_DIAGNOZY[j])==0) {
@@ -267,14 +241,9 @@ void function_o(FILE*file) {
 		if (pocet[i] > max) {
 			max = pocet[i];
 			*str = pole_DIAGNOZY[i];
-			kolkokrat =kolkokrat+ pocet[i];
 		}
-		printf("%s ", pole_DIAGNOZY[i]);
-		printf("%d\n ", pocet[i]);
-		
-
 	}
-	printf("TOTO JE NAJCASTEJSIA DIAGNOZA %s vyskytla sa %d-krat", *str,kolkokrat);
+	printf("Najcastejsie vysetrovana diagnoza do %s je %s vyskytla sa %d-krat\n",inputdatum, *str,max);
 	
 }
 
