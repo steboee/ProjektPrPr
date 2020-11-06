@@ -144,6 +144,28 @@ void function_v(int* pacienti,FILE** ptr) {
 }
 
 
+MostRepeatable(char** string) {
+	int dlzka = 29;
+	int max = 0;
+	int pocet[100] = { 0 };
+	char* str[5];
+	for (int i = 0; i < dlzka; i++) {
+		for (int j = 0; j < dlzka; j++) {
+			if (strcmp(string[i],string[j]) == 0) {
+				pocet[i]++;
+			}
+		}
+		if ((int)pocet[i] > max) {
+			max = pocet[i];
+			*str = string[i];
+		}
+		printf("%d\n", pocet[i]);
+
+	}
+	printf("TOTO JE %d %s \n", max, *str);
+
+}
+
 //NAJCASTEJSIA DIAGNOZA
 void function_o(FILE*file) {
 	if (file == NULL) {
@@ -211,61 +233,51 @@ void function_o(FILE*file) {
 	//FUNCKIA o ... realne :
 	int inputdate = atoi(inputdatum);		//vlozeny datum daj na int 
 	printf("%d\n", inputdate);
-	
-	
-	int pocet_mensich_datumov = 0;
+	char** pole_DIAGNOZY;
+	pole_DIAGNOZY = calloc(pacienti, sizeof(char*));
+	for (int i = 0; i < pacienti; i++) {
+
+	}
+
+	int pocet_mensich_datumov = 0, position = 0;
 	for (int i = 0; i < pacienti; i++) {
 		if (inputdate > atoi(pole_datum_o[i])) {
+			pole_DIAGNOZY[position] = calloc(5, sizeof(char));
+			pole_DIAGNOZY[position] = pole_diagnoza_o[i];
+			position++;
 			pocet_mensich_datumov++;
 		}
 	}
-
-	
-	
-	char *pole_diagnozy[4];
-	int pole_pocty[4] = { 0,0,0,0};
-	int pozicia = 0;
-	for (int i = 0; i < pacienti; i++) {
-		for (int j = 0; j < 4;j++) {
-			if (pole_diagnoza_o[i] == pole_diagnozy[j]) {
-				pole_pocty[j]++;
-			}
-			else {
-				pole_diagnozy[pozicia] = pole_diagnoza_o[i];
-				pole_pocty[pozicia]++;
-				pozicia++;
-				j = 4;
-
-			}
-		}
+	for (int i = 0; i < position; i++) {
+		printf("%s\n", pole_DIAGNOZY[i]);
 	}
-	for (int i = 0; i < 4; i++) {
-		printf("%d %s\n",pole_pocty[i], pole_diagnozy[i]);
-		
-	}
-	
-	
-	
-	/*int pozicia_d = 0;
+	//MostRepeatable(pole_DIAGNOZY);
+	int kolkokrat = 0;
+	int dlzka = 5;
+	int max = 0;
+	int pocet[100] = { 0 };
+	char* str[5];
 	for (int i = 0; i < pocet_mensich_datumov; i++) {
 		for (int j = 0; j < pocet_mensich_datumov; j++) {
-			if (strcmp(pole_DIAGNOSIS[i], pole_DIAGNOSIS[j]) == 0) {
-				printf("Zásah");
-				for (int y = 0; y < 4; y++) {
-					if (strcmp(pole_diagnozy[y], pole_DIAGNOSIS[i]) == 0) {
-						dobre++;
-					}
-				}
-				if (dobre == 0) {
-					pole_diagnozy[pozicia_d] = pole_DIAGNOSIS[i];
-					pozicia_d++;
-				}
-				printf("%s", pole_diagnozy[pozicia_d]);
+			if (strcmp(pole_DIAGNOZY[i],pole_DIAGNOZY[j])==0) {
+				pocet[i]++;
 			}
+
 		}
+		if (pocet[i] > max) {
+			max = pocet[i];
+			*str = pole_DIAGNOZY[i];
+			kolkokrat =kolkokrat+ pocet[i];
+		}
+		printf("%s ", pole_DIAGNOZY[i]);
+		printf("%d\n ", pocet[i]);
+		
+
 	}
-	*/
+	printf("TOTO JE NAJCASTEJSIA DIAGNOZA %s vyskytla sa %d-krat", *str,kolkokrat);
+	
 }
+
 
 
 //ALOKUJE POLIA
@@ -390,28 +402,59 @@ void function_s(char**pole_rodnecislo,char**pole_vysetrenie,char**pole_vysledok,
 
 
 
-void function_h(char** pole_rodnecislo,int pacienti) {
+void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
 	if (pole_rodnecislo == NULL) {
 		printf("Polia niesu Vytvorene - alokuj stalcenim n\n");
 		return;
 	}
 	char *diagnoza[4];
+	printf("Zadaj Diagnozu: ");
 	scanf("%s", &diagnoza);
-	int* vek = calloc(pacienti, sizeof(int));
-
+	
+	int* vek_m = calloc(pacienti, sizeof(int));
+	int* vek_z = calloc(pacienti, sizeof(int));
+	int pohlavie = 0;
+	int roknarodenia=0;
+	int pocet_m = 0;
+	int pocet_z = 0;
 	for (int i = 0; i < pacienti; i++) {
 		int desiatky = ((pole_rodnecislo[i])[0] - '0') * 10 + ((pole_rodnecislo[i])[1] - '0') * 1;
-		if (desiatky < 20) {
-			int roknarodenia = 2000 + desiatky;
-			vek[i] = 2020 - roknarodenia;
+		pohlavie = ((pole_rodnecislo[i])[2] - '0');				//ZENY MAJU V RODNOM CISLE PRI MESIACOCH +50 takze staci desiatky poziret
+		
+		if (desiatky < 20) {					//ZISTOVANIE ÈI narodeny v rokoch 2000 alebo 1900
+			roknarodenia = 2000 + desiatky;
 		}
 		else {
-			int roknarodenia = 1900 + desiatky;
-			vek[i] = 2020 - roknarodenia;
+			roknarodenia = 1900 + desiatky;
 		}
-		printf("%d\n", vek[i]);
+		
+		
+		if (pohlavie >= 5) {				//AK ZENA TAK
+			vek_z[pocet_z] = 2020 - roknarodenia;
+			pocet_z++;
+		}
+		else {
+			vek_m[pocet_m] = 2020 - roknarodenia;
+			pocet_m++;
+		}
 	}
+	printf("%s\n", diagnoza);
+	int position = 0;
+	printf("MUZI:\n");
+	for (int i = 0;i<pacienti ; i++) {
+		if (strcmp(diagnoza,pole_diagnoza[i])==0){
+			if (pohlavie >= 5) {
 
+			}
+			else {
+				printf("%d  - ", vek_m[position]);
+				printf("pozitiv\n");
+				position++;
+			}
+			
+	
+		}
+	}
 
 
 
@@ -444,7 +487,7 @@ int main() {
 			function_s(pole_rodnecislo,pole_vysetrenie,pole_vysledok,pacienti);
 		}
 		if (input == 'h') {
-			function_h(pole_rodnecislo,pacienti);
+			function_h(pole_rodnecislo,pole_diagnoza,pacienti);
 		}
 		if (input == 'k'){
 			exit(1);
