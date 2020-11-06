@@ -5,16 +5,6 @@
 
 
 
-int in(char** arr, int len, char* target) {
-	int i;
-	for (i = 0; i < len; i++) {
-		if (strncmp(arr[i], target, strlen(target)) == 0) {
-			return 1;
-		}
-	}
-	return 0;
-}
-
 
 
 
@@ -27,16 +17,18 @@ void function_v(int* pacienti,FILE** ptr) {
 	}
 	char buff[100];
 	int pocet_riadkov = 0;
-	*pacienti = 0;
-	for (int i = 1; fgets(buff, sizeof(buff), *ptr) != NULL; i++) { // zistovanie poctu riadkov v zaznamoch
-		pocet_riadkov++;
-	}		
-	rewind(*ptr);			// nastavenie sa v subore na zaciatok.
-	int x;
-	x = pocet_riadkov;								//x = lokalna premenna pre nasledujuci for aby nsa zachovala premenná "pocet_riadkov"
-	for (x; x > 0; x = x - 7) {						// zistenie poctu pacientov
-		(*pacienti) = (*pacienti) + 1 ;
+	if (*pacienti == 0) {
+		for (int i = 1; fgets(buff, sizeof(buff), *ptr) != NULL; i++) { // zistovanie poctu riadkov v zaznamoch
+			pocet_riadkov++;
+		}
+		rewind(*ptr);			// nastavenie sa v subore na zaciatok.
+		int x;
+		x = pocet_riadkov;								//x = lokalna premenna pre nasledujuci for aby nsa zachovala premenná "pocet_riadkov"
+		for (x; x > 0; x = x - 7) {						// zistenie poctu pacientov
+			(*pacienti) = (*pacienti) + 1;
+		}
 	}
+	
 	
 	int korektnost = 0;
 	int pocitadlo = 0;
@@ -219,14 +211,14 @@ void function_o(FILE*file) {
 	for (int i = 0; i < pacienti; i++) {								// ALOKOVALIE POLA DIAGNOZA[i] + zistovanie kolko datumov je mensich ako vstupny
 		if (inputdate > atoi(pole_datum_o[i])) {
 			pole_DIAGNOZY[position] = calloc(5, sizeof(char));
-			pole_DIAGNOZY[position] = pole_diagnoza_o[i];
+			pole_DIAGNOZY[position] = (pole_diagnoza_o)[i];
 			position++;
 			pocet_mensich_datumov++;
 		}
 	}
 	
 	
-	int kolkokrat = 0;
+
 	int dlzka = 5;
 	int max = 0;
 	int pocet[100] = { 0 };
@@ -244,7 +236,16 @@ void function_o(FILE*file) {
 		}
 	}
 	printf("Najcastejsie vysetrovana diagnoza do %s je %s vyskytla sa %d-krat\n",inputdatum, *str,max);
-	
+	for (int i = 0; i < pacienti; i++) {
+		free(pole_datum_o[i]);
+		free(pole_diagnoza_o[i]);
+	}
+	for (int i = 0; i < position; i++) {
+		//free(pole_DIAGNOZY[i]);
+	}
+	free(pole_diagnoza_o);
+	free(pole_datum_o);
+	free(pole_DIAGNOZY);
 }
 
 
@@ -363,14 +364,6 @@ void function_s(char**pole_rodnecislo,char**pole_vysetrenie,char**pole_vysledok,
 
 
 
-
-
-
-
-
-
-
-
 void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
 	if (pole_rodnecislo == NULL) {
 		printf("Polia niesu Vytvorene - alokuj stalcenim n\n");
@@ -476,7 +469,8 @@ void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
 			}
 		}
 	}
-	
+	free(vek_m);
+	free(vek_z);
 }
 
 
@@ -508,6 +502,20 @@ int main() {
 			function_h(pole_rodnecislo,pole_diagnoza,pacienti);
 		}
 		if (input == 'k'){
+			for (int i = 0; i < pacienti; i++) {
+				free((pole_meno)[i]);
+				free((pole_rodnecislo)[i]);
+				free((pole_diagnoza)[i]);
+				free((pole_vysetrenie)[i]);
+				free((pole_vysledok)[i]);
+				free((pole_datum)[i]);
+			}
+			free(pole_meno);
+			free(pole_rodnecislo);
+			free(pole_diagnoza);
+			free(pole_vysetrenie);
+			free(pole_vysledok);
+			free(pole_datum);
 			exit(1);
 		}
 		
