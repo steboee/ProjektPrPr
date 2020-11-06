@@ -376,9 +376,9 @@ void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
 		printf("Polia niesu Vytvorene - alokuj stalcenim n\n");
 		return;
 	}
-	char *diagnoza[4];
+	char diagnoza[4] = {""};
 	printf("Zadaj Diagnozu: ");
-	scanf("%s", &diagnoza);
+	scanf("%s", diagnoza);
 	
 	int* vek_m = calloc(pacienti, sizeof(int));
 	int* vek_z = calloc(pacienti, sizeof(int));
@@ -386,48 +386,97 @@ void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
 	int roknarodenia=0;
 	int pocet_m = 0;
 	int pocet_z = 0;
+	//vek muzov a zien uklada do polí
 	for (int i = 0; i < pacienti; i++) {
-		int desiatky = ((pole_rodnecislo[i])[0] - '0') * 10 + ((pole_rodnecislo[i])[1] - '0') * 1;
-		pohlavie = ((pole_rodnecislo[i])[2] - '0');				//ZENY MAJU V RODNOM CISLE PRI MESIACOCH +50 takze staci desiatky poziret
-		
-		if (desiatky < 20) {					//ZISTOVANIE ÈI narodeny v rokoch 2000 alebo 1900
-			roknarodenia = 2000 + desiatky;
-		}
-		else {
-			roknarodenia = 1900 + desiatky;
-		}
-		
-		
-		if (pohlavie >= 5) {				//AK ZENA TAK
-			vek_z[pocet_z] = 2020 - roknarodenia;
-			pocet_z++;
-		}
-		else {
-			vek_m[pocet_m] = 2020 - roknarodenia;
-			pocet_m++;
-		}
-	}
-	printf("%s\n", diagnoza);
-	int position = 0;
-	printf("MUZI:\n");
-	for (int i = 0;i<pacienti ; i++) {
-		if (strcmp(diagnoza,pole_diagnoza[i])==0){
-			if (pohlavie >= 5) {
+		if (strcmp(diagnoza, pole_diagnoza[i]) == 0) {
+			int desiatky = ((pole_rodnecislo[i])[0] - '0') * 10 + ((pole_rodnecislo[i])[1] - '0') * 1;
+			pohlavie = ((pole_rodnecislo[i])[2] - '0');				//ZENY MAJU V RODNOM CISLE PRI MESIACOCH +50 takze staci desiatky poziret
 
+			if (desiatky < 20) {					//ZISTOVANIE ÈI narodeny v rokoch 2000 alebo 1900
+				roknarodenia = 2000 + desiatky;
 			}
 			else {
-				printf("%d  - ", vek_m[position]);
-				printf("pozitiv\n");
-				position++;
+				roknarodenia = 1900 + desiatky;
 			}
-			
-	
+
+
+			if (pohlavie >= 5) {				//AK ZENA TAK
+				vek_z[pocet_z] = 2020 - roknarodenia;
+				pocet_z++;
+			}
+			else {
+				vek_m[pocet_m] = 2020 - roknarodenia;
+				pocet_m++;
+			}
+		}
+		
+	}
+	printf("\n");
+	printf("Pocet muzov s %s: %d\n", diagnoza, pocet_m);
+	printf("Pocet zien s %s: %d\n", diagnoza, pocet_z);
+	printf("\n");
+
+	//VYPIS MUZOV
+	printf("Muzi:\n");
+	for (int i = 0; i < 1; i++) {
+		int Freq[100];
+		int Count;
+		for (int i = 0; i < pocet_m; i++)
+		{
+			Count = 1;								//Vždy je jeden prvok
+			for (int j = i + 1; j < pocet_m; j++)
+			{
+				if (vek_m[i] == vek_m[j])
+				{
+					Count++;			// pocet sa zvysi o 1 ak sa nasiel taky isty vek
+					Freq[j] = 0;		// Ak sa rovna tak nanho nastav nulu
+				}
+			}
+			if (Freq[i] != 0)			// Ak Freq[i] == 0  --> Tento prvok už  bol zarataný...... pozri komentár o jedno vyssie
+			{
+				Freq[i] = Count;		// Ak Freq[i] != 0 ---> Tak prirad pocet 
+			}
+		}
+		for (int i = 0; i < pocet_m; i++)		//Vypis pre muzov ktory maju danu diagnozu , pocet_z --> pocet muzov so zadanou diagnozou 
+		{
+			if (Freq[i] != 0)				// Ak Freq[i] == 0 ---> Tak tento prvok uz som vypisal 
+			{
+				printf("%d: %d\n", vek_m[i], Freq[i]);
+			}
 		}
 	}
+	printf("\n");
 
-
-
-
+	//VYPIS ZIEN
+	printf("Zeny:\n");
+	for (int i = 0; i < 1; i++) {
+		int Freq[100];
+		int Count;
+		for (int i = 0; i < pocet_z; i++)
+		{
+			Count = 1;								//Vždy je jedne prvok
+			for (int j = i + 1; j < pocet_z; j++)
+			{
+				if (vek_z[i] == vek_z[j])
+				{
+					Count++;			// pocet sa zvysi o 1 ak sa nasiel taky isty vek
+					Freq[j] = 0;		// Ak sa rovna tak nanho nastav nulu
+				}
+			}
+			if (Freq[i] != 0)			// Ak Freq[i] == 0  --> Tento prvok už  bol zarataný...... pozri komentár o jedno vyssie
+			{
+				Freq[i] = Count;		// Ak Freq[i] != 0 ---> Tak prirad pocet 
+			}
+		}
+		for (int i = 0; i < pocet_z; i++)		//Vypis pre zeny ktore maju danu diagnozu , pocet_z --> pocet zien so zadanou diagnozou 
+		{
+			if (Freq[i] != 0)				// Ak Freq[i] == 0 ---> Tak tento prvok uz som vypisal 
+			{
+				printf("%d: %d\n", vek_z[i], Freq[i]);
+			}
+		}
+	}
+	
 }
 
 
