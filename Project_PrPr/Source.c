@@ -330,6 +330,7 @@ void function_n(FILE* file, char*** pole_meno, char*** pole_rodnecislo, char*** 
 }
 
 
+
 //RODNE CISLO : VYSETRENIE a VYSLEDOK 
 void function_s(char**pole_rodnecislo,char**pole_vysetrenie,char**pole_vysledok,int pacienti) {
 	
@@ -474,6 +475,23 @@ void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
 }
 
 
+void function_p() {
+	char* rodnecislo[10*sizeof(char)];
+	char* vysetrenie[4];
+	char* datum[4];
+	int vysledok;
+	printf("Nacitaj rodne cislo: ");
+	scanf("%s", rodnecislo);
+	printf("Nacitaj vysetrenie: ");
+	scanf("%s", vysetrenie);
+	printf("Nacitaj datum vysetrenia: ");
+	scanf("%s", datum);
+	printf("Nacitaj vysledok: ");
+	scanf("%d", &vysledok);
+	printf("Pacientovi s rodnym cislo %s bol zmeneny vysledok vysetrenia %s z povodnej hodnoty 214 na novu hodnotu %d", rodnecislo, vysetrenie, vysledok);
+	
+
+}
 
 
 
@@ -500,6 +518,9 @@ int main() {
 		}
 		if (input == 'h') {
 			function_h(pole_rodnecislo,pole_diagnoza,pacienti);
+		}
+		if (input == 'p') {
+			function_p();
 		}
 		if (input == 'k'){
 			for (int i = 0; i < pacienti; i++) {
