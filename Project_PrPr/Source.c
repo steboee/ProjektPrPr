@@ -18,9 +18,6 @@ void function_v(int* pacienti,FILE** ptr) {
 	char buff[100];
 	int pocet_riadkov = 0;
 	if (*pacienti == 0) {
-		for (int i = 1; fgets(buff, sizeof(buff), *ptr) != NULL; i++) { // zistovanie poctu riadkov v zaznamoch
-			pocet_riadkov++;
-		}
 		rewind(*ptr);			// nastavenie sa v subore na zaciatok.
 		int x;
 		x = pocet_riadkov;								//x = lokalna premenna pre nasledujuci for aby nsa zachovala premenná "pocet_riadkov"
@@ -28,8 +25,10 @@ void function_v(int* pacienti,FILE** ptr) {
 			(*pacienti) = (*pacienti) + 1;
 		}
 	}
-	
-	
+	for (int i = 1; fgets(buff, sizeof(buff), *ptr) != NULL; i++) { // zistovanie poctu riadkov v zaznamoch
+		pocet_riadkov++;
+	}
+ 	fseek(*ptr, 0, SEEK_SET);
 	int korektnost = 0;
 	int pocitadlo = 0;
 	printf("\n------------------- ZACIATOK ZAZNAMOV -------------------\n\n");
@@ -95,13 +94,30 @@ void function_v(int* pacienti,FILE** ptr) {
 			}
 		}
 		//VYSLEDOK
+		
 		else if (i == 5 + 7 * pocitadlo) {
+			//int pozicia = 0;
+			//int bodka=0;
 			printf("Vysledok: %s", buff);
 			if (atoi(buff) > 1000) {
 				printf("###### - Nekorektne zadany vstup Vysledok - #######\n\n");
 				korektnost++;
 			}
+			/*else {
+				while (buff[pozicia] != '\0') {
+					if (buff[pozicia] == '.') {
+						bodka = pozicia;
+					}
+					pozicia++;
+				}
+				int pocet_desatinnych = (strlen(buff)-1) - (bodka + 1);
+				if (pocet_desatinnych > 4) {
+					printf("###### - Nekorektne zadany vstup Vysledok - #######\n\n");
+					korektnost++;
+				}
+			}*/
 		}
+
 		//DATUM
 		else if (i == 6 + 7 * pocitadlo) {
 			printf("Datum: %s", buff);
