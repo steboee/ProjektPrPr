@@ -357,7 +357,10 @@ void function_n(FILE* file, char*** pole_meno, char*** pole_rodnecislo, char*** 
 
 //RODNE CISLO : VYSETRENIE a VYSLEDOK 
 void function_s(char**pole_rodnecislo,char**pole_vysetrenie,char**pole_vysledok,int pacienti) {
-	
+	if (pole_rodnecislo == NULL) {
+		printf("Polia niesu Vytvorene - alokuj stalcenim n\n");
+		return;
+	}
 	puts("");
 	printf("------------------- FUNKCIA S  -------------------\n");
 	char vstup[12];												//lokalny string pre vstup
@@ -365,8 +368,6 @@ void function_s(char**pole_rodnecislo,char**pole_vysetrenie,char**pole_vysledok,
 	scanf("%s", &vstup);
 	int position = -1;											// Pre pripad zeby sa rodne cislo nenaslo v zozname
 	for (int i = 0; i < pacienti;i++) {
-		printf("%s\n", vstup);
-		printf("%s\n",pole_rodnecislo[i]);
 		if (strncmp(vstup,pole_rodnecislo[i],10)==0){			// strncmp porovnava 2 stringy po znaku (10 prvych znakov skontroluje)
 			position = i;										// nastav position na momentalnu poziciu ----> i
 		}
@@ -516,8 +517,7 @@ void function_p(FILE*ptr,char**pole_meno,char**pole_rodnecislo,char**pole_vysetr
 	char datum[9];
 	char vysledok[10];
 	int pozicia = 0;
-	char** old = calloc(1, sizeof(char*));
-	old[0] = calloc(10, sizeof(char));
+	float cislo;
 	printf("Nacitaj rodne cislo: ");
 	scanf("%s", &rodnecislo);
 	printf("Nacitaj vysetrenie: ");
@@ -529,13 +529,16 @@ void function_p(FILE*ptr,char**pole_meno,char**pole_rodnecislo,char**pole_vysetr
 			pozicia = i;
 		}
 	}
-	printf("Nacitaj vysledok: ");
+	fseek(ptr, (pozicia * 7) - 2, SEEK_CUR);
+	
+	cislo = atof((pole_vysledok)[pozicia]);
+	
 	scanf("%s", pole_vysledok[pozicia]);
-	printf("%s", pole_vysledok[pozicia]);
 	
+	fprintf(ptr, "%s", pole_vysledok[pozicia]);
 	
-	printf("Pacientovi s rodnym cislom %s bol zmeneny vysledok\n vysetrenia %s z povodnej hodnoty %s na novu hodnotu %s\n", rodnecislo, vysetrenie, old[0], (pole_vysledok)[pozicia]);
-	free(old);
+	printf("Pacientovi s rodnym cislom %s bol zmeneny vysledok\n vysetrenia %s z povodnej hodnoty %g na novu hodnotu %s\n", rodnecislo, vysetrenie, cislo, pole_vysledok[pozicia]);
+	//free(old);
 }
 
 
