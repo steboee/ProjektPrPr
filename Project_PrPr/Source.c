@@ -500,7 +500,8 @@ void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
 }
 
 
-void function_p(char**pole_meno,char**pole_rodnecislo,char**pole_vysetrenie,char**pole_datum,char***pole_vysledok,int pacienti) {
+void function_p(FILE*ptr,char**pole_meno,char**pole_rodnecislo,char**pole_vysetrenie,char**pole_datum,char**pole_vysledok,int pacienti) {
+	fclose(ptr);
 	if (pole_rodnecislo == NULL) {
 		printf("Polia niesu Vytvorene - alokuj stalcenim n\n");
 		return;
@@ -514,34 +515,27 @@ void function_p(char**pole_meno,char**pole_rodnecislo,char**pole_vysetrenie,char
 	char vysetrenie[100];
 	char datum[9];
 	char vysledok[10];
+	int pozicia = 0;
 	char** old = calloc(1, sizeof(char*));
 	old[0] = calloc(10, sizeof(char));
 	printf("Nacitaj rodne cislo: ");
-	scanf("%s", rodnecislo);
+	scanf("%s", &rodnecislo);
 	printf("Nacitaj vysetrenie: ");
-	scanf("%s", vysetrenie);
+	scanf("%s", &vysetrenie);
 	printf("Nacitaj datum vysetrenia: ");
-	scanf("%s", datum);
-	printf("Nacitaj vysledok: ");
-	scanf("%s", vysledok);
-	int pozicia = 0;
-	for (int i = 0;i < pacienti; i++) {
-		if (strcmp(pole_rodnecislo[i], rodnecislo)==0) {
+	scanf("%s", &datum);
+	for (int i = 0; i < pacienti; i++) {
+		if (strcmp(pole_rodnecislo[i], rodnecislo) == 0) {
 			pozicia = i;
-			printf("TOTO JE NAS PACIENT: %s\n",pole_meno[i]);
-			old[0] = (*pole_vysledok)[i];
-			(*pole_vysledok)[i] = vysledok;
 		}
 	}
-	printf("Pacientovi s rodnym cislom %s bol zmeneny vysledok\n vysetrenia %s z povodnej hodnoty %s na novu hodnotu %s\n", rodnecislo, vysetrenie, old[0], vysledok);
-	old[0] = NULL;
-	free(old[0]);
-	old = NULL;
+	printf("Nacitaj vysledok: ");
+	scanf("%s", pole_vysledok[pozicia]);
+	printf("%s", pole_vysledok[pozicia]);
+	
+	
+	printf("Pacientovi s rodnym cislom %s bol zmeneny vysledok\n vysetrenia %s z povodnej hodnoty %s na novu hodnotu %s\n", rodnecislo, vysetrenie, old[0], (pole_vysledok)[pozicia]);
 	free(old);
-	free(*pole_vysledok[pozicia]);
-	
-	
-
 }
 
 
@@ -578,7 +572,7 @@ int main() {
 			function_h(pole_rodnecislo,pole_diagnoza,pacienti);
 		}
 		if (input == 'p') {
-			function_p(pole_meno,pole_rodnecislo,pole_vysetrenie,pole_datum,&pole_vysledok,pacienti);
+			function_p(file,pole_meno,pole_rodnecislo,pole_vysetrenie,pole_datum,pole_vysledok,pacienti);
 		}
 		if (input == 'k'){
 			for (int i = 0; i < pacienti; i++) {
