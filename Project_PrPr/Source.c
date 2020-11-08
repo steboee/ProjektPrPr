@@ -18,20 +18,27 @@ void function_v(int* pacienti,FILE** ptr) {
 	char buff[100];
 	int pocet_riadkov = 0;
 	if (*pacienti == 0) {
-		rewind(*ptr);			// nastavenie sa v subore na zaciatok.
+		rewind(*ptr);	// nastavenie sa v subore na zaciatok.
+		for (int i = 1; fgets(buff, sizeof(buff), *ptr) != NULL; i++) { // zistovanie poctu riadkov v zaznamoch
+			pocet_riadkov++;
+		}
 		int x;
 		x = pocet_riadkov;								//x = lokalna premenna pre nasledujuci for aby nsa zachovala premenná "pocet_riadkov"
 		for (x; x > 0; x = x - 7) {						// zistenie poctu pacientov
 			(*pacienti) = (*pacienti) + 1;
 		}
 	}
-	for (int i = 1; fgets(buff, sizeof(buff), *ptr) != NULL; i++) { // zistovanie poctu riadkov v zaznamoch
-		pocet_riadkov++;
+	else {
+		for (int i = 1; fgets(buff, sizeof(buff), *ptr) != NULL; i++) { // zistovanie poctu riadkov v zaznamoch
+			pocet_riadkov++;
+		}
 	}
+	
  	fseek(*ptr, 0, SEEK_SET);
 	int korektnost = 0;
 	int pocitadlo = 0;
 	printf("\n------------------- ZACIATOK ZAZNAMOV -------------------\n\n");
+
 	for (int i = 1; i <= pocet_riadkov; i++) {
 		fgets(buff, sizeof(buff), *ptr);
 		//MENO PRIEZVISKO
@@ -96,26 +103,26 @@ void function_v(int* pacienti,FILE** ptr) {
 		//VYSLEDOK
 		
 		else if (i == 5 + 7 * pocitadlo) {
-			//int pozicia = 0;
-			//int bodka=0;
+			int pozicia = 0;
+			int bodka=0;
 			printf("Vysledok: %s", buff);
 			if (atoi(buff) > 1000) {
 				printf("###### - Nekorektne zadany vstup Vysledok - #######\n\n");
 				korektnost++;
 			}
-			/*else {
+			else {
 				while (buff[pozicia] != '\0') {
 					if (buff[pozicia] == '.') {
 						bodka = pozicia;
 					}
 					pozicia++;
 				}
-				int pocet_desatinnych = (strlen(buff)-1) - (bodka + 1);
+				int pocet_desatinnych = (int)((strlen(buff)-1)) - (bodka + 1);
 				if (pocet_desatinnych > 4) {
 					printf("###### - Nekorektne zadany vstup Vysledok - #######\n\n");
 					korektnost++;
 				}
-			}*/
+			}
 		}
 
 		//DATUM
@@ -145,6 +152,7 @@ void function_v(int* pacienti,FILE** ptr) {
 
 	}
 	printf("\n------------------- KONIEC ZAZNAMOV -------------------\n");
+
 	if (korektnost > 0) {
 		exit(1);
 	}
@@ -381,6 +389,7 @@ void function_s(char**pole_rodnecislo,char**pole_vysetrenie,char**pole_vysledok,
 
 
 
+// HISTOGRAM ZENY MUZI
 void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
 	if (pole_rodnecislo == NULL) {
 		printf("Polia niesu Vytvorene - alokuj stalcenim n\n");
@@ -491,11 +500,22 @@ void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
 }
 
 
-void function_p() {
-	char* rodnecislo[10*sizeof(char)];
-	char* vysetrenie[4];
-	char* datum[4];
-	int vysledok;
+void function_p(char**pole_meno,char**pole_rodnecislo,char**pole_vysetrenie,char**pole_datum,char***pole_vysledok,int pacienti) {
+	if (pole_rodnecislo == NULL) {
+		printf("Polia niesu Vytvorene - alokuj stalcenim n\n");
+		return;
+	}
+	FILE* file = fopen("pacienti.txt", "r+");
+	if (file == NULL) {
+		printf("Neotvoreny subor\n");
+	}
+
+	char rodnecislo[11];
+	char vysetrenie[100];
+	char datum[9];
+	char vysledok[10];
+	char** old = calloc(1, sizeof(char*));
+	old[0] = calloc(10, sizeof(char));
 	printf("Nacitaj rodne cislo: ");
 	scanf("%s", rodnecislo);
 	printf("Nacitaj vysetrenie: ");
@@ -503,8 +523,23 @@ void function_p() {
 	printf("Nacitaj datum vysetrenia: ");
 	scanf("%s", datum);
 	printf("Nacitaj vysledok: ");
-	scanf("%d", &vysledok);
-	printf("Pacientovi s rodnym cislo %s bol zmeneny vysledok vysetrenia %s z povodnej hodnoty 214 na novu hodnotu %d", rodnecislo, vysetrenie, vysledok);
+	scanf("%s", vysledok);
+	int pozicia = 0;
+	for (int i = 0;i < pacienti; i++) {
+		if (strcmp(pole_rodnecislo[i], rodnecislo)==0) {
+			pozicia = i;
+			printf("TOTO JE NAS PACIENT: %s\n",pole_meno[i]);
+			old[0] = (*pole_vysledok)[i];
+			(*pole_vysledok)[i] = vysledok;
+		}
+	}
+	printf("Pacientovi s rodnym cislom %s bol zmeneny vysledok\n vysetrenia %s z povodnej hodnoty %s na novu hodnotu %s\n", rodnecislo, vysetrenie, old[0], vysledok);
+	old[0] = NULL;
+	free(old[0]);
+	old = NULL;
+	free(old);
+	free(*pole_vysledok[pozicia]);
+	
 	
 
 }
@@ -519,6 +554,13 @@ int main() {
 	FILE* file = NULL;
 	int pacienti = 0;
 	char** pole_meno = NULL, ** pole_rodnecislo = NULL, ** pole_diagnoza = NULL, ** pole_vysetrenie = NULL, ** pole_vysledok = NULL, ** pole_datum = NULL;
+	printf("FUNKCIE:\n");
+	printf("v: Vypise vsetky zaznamy a upozorni na pripadne nekorektne zaznamy\n");
+	printf("o: Vypise najcastejsiu diagnozu do zadaneho datumu\n");
+	printf("n: Alokuje dynamicke polia pre polozky v zozname a vlozi zaznamy\n");
+	printf("s: Nacita na zaklade rodneho cisla udaje o pacientovi\n");
+	printf("h: Vypise histogram pre danu diagnozu\n");
+	puts("");
 	while (scanf("%c", &input)) {
 		if (input == 'v') {
 			function_v(&pacienti, &file);
@@ -536,7 +578,7 @@ int main() {
 			function_h(pole_rodnecislo,pole_diagnoza,pacienti);
 		}
 		if (input == 'p') {
-			function_p();
+			function_p(pole_meno,pole_rodnecislo,pole_vysetrenie,pole_datum,&pole_vysledok,pacienti);
 		}
 		if (input == 'k'){
 			for (int i = 0; i < pacienti; i++) {
