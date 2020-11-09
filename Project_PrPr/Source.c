@@ -553,9 +553,11 @@ void function_p(FILE*ptr,char**pole_meno,char**pole_rodnecislo,char**pole_vysetr
 	}
 	fclose(tempfile);
 	fclose(ptr);
+	//PREPIS SUBORU A ODSTRANENIE docasneho Suboru
 	rename("pacienti.txt", "tempfile1.txt");
 	rename("tempfile.txt", "pacienti.txt");
 	rename("tempfile1.txt", "tempfile.txt");
+	remove("tempfile.txt");
 
 	
 	
