@@ -232,7 +232,7 @@ void function_o(FILE*file) {
 	for (int i = 0; i < pacienti; i++) {								// ALOKOVALIE POLA DIAGNOZA[i] + zistovanie kolko datumov je mensich ako vstupny
 		if (inputdate > atoi(pole_datum_o[i])) {
 			pole_DIAGNOZY[position] = calloc(5, sizeof(char));
-			pole_DIAGNOZY[position] = gets_s((pole_diagnoza_o)[i],256);
+			strcpy(pole_DIAGNOZY[position], pole_diagnoza_o[i]);
 			position++;
 			pocet_mensich_datumov++;
 		}
@@ -243,7 +243,7 @@ void function_o(FILE*file) {
 	int dlzka = 5;
 	int max = 0;
 	int pocet[100] = { 0 };
-	char *str[5];
+	char* str[5] = { "" };
 	for (int i = 0; i < pocet_mensich_datumov; i++) {
 		for (int j = 0; j < pocet_mensich_datumov; j++) {
 			if (strcmp(pole_DIAGNOZY[i],pole_DIAGNOZY[j])==0) {
