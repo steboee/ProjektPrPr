@@ -9,28 +9,28 @@
 
 
 //VYPIS ZO SUBORU
-void function_v(int* pacienti,FILE** ptr) {
+void function_v(int* pacienti,FILE** ptr,int *pocet_riadkov) {
 	*ptr = fopen("pacienti.txt", "r");
 	if (*ptr == NULL) {
 		printf("NEPODARILO SA OTVORIT SUBOR");
 		exit(1);
 	}
 	char buff[100];
-	int pocet_riadkov = 0;
+	(*pocet_riadkov) = 0;
 	if (*pacienti == 0) {
 		rewind(*ptr);	// nastavenie sa v subore na zaciatok.
 		for (int i = 1; fgets(buff, sizeof(buff), *ptr) != NULL; i++) { // zistovanie poctu riadkov v zaznamoch
-			pocet_riadkov++;
+			(*pocet_riadkov) = (*pocet_riadkov) + 1;
 		}
 		int x;
-		x = pocet_riadkov;								//x = lokalna premenna pre nasledujuci for aby nsa zachovala premenná "pocet_riadkov"
+		x = (*pocet_riadkov);								//x = lokalna premenna pre nasledujuci for aby nsa zachovala premenná "pocet_riadkov"
 		for (x; x > 0; x = x - 7) {						// zistenie poctu pacientov
 			(*pacienti) = (*pacienti) + 1;
 		}
 	}
 	else {
 		for (int i = 1; fgets(buff, sizeof(buff), *ptr) != NULL; i++) { // zistovanie poctu riadkov v zaznamoch
-			pocet_riadkov++;
+			(*pocet_riadkov) = (*pocet_riadkov) + 1;
 		}
 	}
 	
@@ -39,7 +39,7 @@ void function_v(int* pacienti,FILE** ptr) {
 	int pocitadlo = 0;
 	printf("\n------------------- ZACIATOK ZAZNAMOV -------------------\n\n");
 
-	for (int i = 1; i <= pocet_riadkov; i++) {
+	for (int i = 1; i <= (*pocet_riadkov); i++) {
 		fgets(buff, sizeof(buff), *ptr);
 		//MENO PRIEZVISKO
 		if (i == 1 + 7 * pocitadlo) {
@@ -501,23 +501,25 @@ void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
 }
 
 
-void function_p(FILE*ptr,char**pole_meno,char**pole_rodnecislo,char**pole_vysetrenie,char**pole_datum,char**pole_vysledok,int pacienti) {
-	fclose(ptr);
+//PREPIS UDAJU
+void function_p(FILE*ptr,char**pole_meno,char**pole_rodnecislo,char**pole_vysetrenie,char**pole_datum,char**pole_vysledok,int pacienti,int pocet_riadkov) {
+
 	if (pole_rodnecislo == NULL) {
 		printf("Polia niesu Vytvorene - alokuj stalcenim n\n");
 		return;
 	}
-	FILE* file = fopen("pacienti.txt", "r+");
-	if (file == NULL) {
+	FILE* tempfile = fopen("tempfile.txt", "w");
+	if (ptr == NULL) {
 		printf("Neotvoreny subor\n");
 	}
+
 
 	char rodnecislo[11];
 	char vysetrenie[100];
 	char datum[9];
-	char vysledok[10];
+	
 	int pozicia = 0;
-	float cislo;
+	double cislo;
 	printf("Nacitaj rodne cislo: ");
 	scanf("%s", &rodnecislo);
 	printf("Nacitaj vysetrenie: ");
@@ -529,15 +531,44 @@ void function_p(FILE*ptr,char**pole_meno,char**pole_rodnecislo,char**pole_vysetr
 			pozicia = i;
 		}
 	}
-	fseek(ptr, (pozicia * 7) - 2, SEEK_CUR);
 	
+	// UKLADA DO DYNAMICKEHO POLA
 	cislo = atof((pole_vysledok)[pozicia]);
-	
+	printf("Nacitaj novy vysledok: ");
 	scanf("%s", pole_vysledok[pozicia]);
+
+	int replace_line = ((pozicia + 1) * 7) - 2;
+	int line = 1;
+	fseek(ptr, 0, SEEK_SET); //nastavenie na zaciatok file
+	char string[100];
 	
-	fprintf(ptr, "%s", pole_vysledok[pozicia]);
+	fgets(string, sizeof(string), ptr);
+	for (int i = 1; i <= pocet_riadkov; i++){
+		if (i == replace_line) {
+			fputs(pole_vysledok[pozicia],tempfile);
+			fputs("\n",tempfile);
+		}
+		else {
+			fputs(string,tempfile);
+		}
+		fgets(string, sizeof(string), ptr);
+	}
+	fclose(tempfile);
+	fclose(ptr);
+	rename("pacienti.txt", "tempfile1.txt");
+	rename("tempfile.txt", "pacienti.txt");
+	rename("tempfile1.txt", "tempfile.txt");
+
 	
-	printf("Pacientovi s rodnym cislom %s bol zmeneny vysledok\n vysetrenia %s z povodnej hodnoty %g na novu hodnotu %s\n", rodnecislo, vysetrenie, cislo, pole_vysledok[pozicia]);
+	
+
+
+	
+	
+
+	
+	
+	printf("Pacientovi s rodnym cislom %s bol zmeneny vysledok\nvysetrenia %s z povodnej hodnoty %g na novu hodnotu %s\n", rodnecislo, vysetrenie, cislo, pole_vysledok[pozicia]);
 	//free(old);
 }
 
@@ -550,6 +581,7 @@ int main() {
 	char input;
 	FILE* file = NULL;
 	int pacienti = 0;
+	int pocet_riadkov = 0;
 	char** pole_meno = NULL, ** pole_rodnecislo = NULL, ** pole_diagnoza = NULL, ** pole_vysetrenie = NULL, ** pole_vysledok = NULL, ** pole_datum = NULL;
 	printf("FUNKCIE:\n");
 	printf("v: Vypise vsetky zaznamy a upozorni na pripadne nekorektne zaznamy\n");
@@ -560,7 +592,7 @@ int main() {
 	puts("");
 	while (scanf("%c", &input)) {
 		if (input == 'v') {
-			function_v(&pacienti, &file);
+			function_v(&pacienti, &file, &pocet_riadkov);
 		}
 		if (input == 'o') {
 			function_o(file);
@@ -575,7 +607,7 @@ int main() {
 			function_h(pole_rodnecislo,pole_diagnoza,pacienti);
 		}
 		if (input == 'p') {
-			function_p(file,pole_meno,pole_rodnecislo,pole_vysetrenie,pole_datum,pole_vysledok,pacienti);
+			function_p(file,pole_meno,pole_rodnecislo,pole_vysetrenie,pole_datum,pole_vysledok,pacienti,pocet_riadkov);
 		}
 		if (input == 'k'){
 			for (int i = 0; i < pacienti; i++) {
