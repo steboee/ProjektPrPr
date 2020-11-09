@@ -4,10 +4,6 @@
 #include <string.h>
 
 
-
-
-
-
 //VYPIS ZO SUBORU
 void function_v(int* pacienti,FILE** ptr,int *pocet_riadkov) {
 	*ptr = fopen("pacienti.txt", "r");
@@ -231,11 +227,12 @@ void function_o(FILE*file) {
 	pole_DIAGNOZY = calloc(pacienti, sizeof(char*));
 	
 
-	int pocet_mensich_datumov = 0, position = 0;			
+	int pocet_mensich_datumov = 0;
+	int position = 0;			
 	for (int i = 0; i < pacienti; i++) {								// ALOKOVALIE POLA DIAGNOZA[i] + zistovanie kolko datumov je mensich ako vstupny
 		if (inputdate > atoi(pole_datum_o[i])) {
 			pole_DIAGNOZY[position] = calloc(5, sizeof(char));
-			pole_DIAGNOZY[position] = (pole_diagnoza_o)[i];
+			pole_DIAGNOZY[position] = gets_s((pole_diagnoza_o)[i],256);
 			position++;
 			pocet_mensich_datumov++;
 		}
@@ -246,7 +243,7 @@ void function_o(FILE*file) {
 	int dlzka = 5;
 	int max = 0;
 	int pocet[100] = { 0 };
-	char* str[5] = {""};
+	char *str[5];
 	for (int i = 0; i < pocet_mensich_datumov; i++) {
 		for (int j = 0; j < pocet_mensich_datumov; j++) {
 			if (strcmp(pole_DIAGNOZY[i],pole_DIAGNOZY[j])==0) {
@@ -256,6 +253,7 @@ void function_o(FILE*file) {
 		}
 		if (pocet[i] > max) {
 			max = pocet[i];
+			
 			*str = pole_DIAGNOZY[i];
 		}
 	}
@@ -265,7 +263,7 @@ void function_o(FILE*file) {
 		free(pole_diagnoza_o[i]);
 	}
 	for (int i = 0; i < position; i++) {
-		//free(pole_DIAGNOZY[i]);
+		free(pole_DIAGNOZY[i]);
 	}
 	free(pole_diagnoza_o);
 	free(pole_datum_o);
@@ -573,8 +571,11 @@ void function_p(FILE*ptr,char**pole_meno,char**pole_rodnecislo,char**pole_vysetr
 }
 
 
+void function_z() {
 
 
+
+}
 
 
 int main() {
@@ -608,6 +609,9 @@ int main() {
 		}
 		if (input == 'p') {
 			function_p(file,pole_meno,pole_rodnecislo,pole_vysetrenie,pole_datum,pole_vysledok,pacienti,pocet_riadkov);
+		}
+		if (input == 'p') {
+			function_z();
 		}
 		if (input == 'k'){
 			for (int i = 0; i < pacienti; i++) {

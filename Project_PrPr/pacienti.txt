@@ -2,7 +2,7 @@ Martin Balaz
 8802010976
 H05
 ASLO
-1000
+999
 20191130
 
 Monika Kovacova
