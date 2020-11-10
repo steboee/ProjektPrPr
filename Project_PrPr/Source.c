@@ -391,7 +391,7 @@ void function_s(char**pole_rodnecislo,char**pole_vysetrenie,char**pole_vysledok,
 
 // HISTOGRAM ZENY MUZI
 void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
-	if (pole_rodnecislo == NULL) {
+	if (pole_rodnecislo == NULL || pole_diagnoza == NULL) {
 		printf("Polia niesu Vytvorene - alokuj stalcenim n\n");
 		return;
 	}
@@ -531,6 +531,7 @@ void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
 }
 
 
+
 //PREPIS UDAJU
 void function_p(FILE*ptr,char**pole_meno,char**pole_rodnecislo,char**pole_vysetrenie,char**pole_datum,char**pole_vysledok,int pacienti,int pocet_riadkov) {
 
@@ -548,6 +549,7 @@ void function_p(FILE*ptr,char**pole_meno,char**pole_rodnecislo,char**pole_vysetr
 	char vysetrenie[100];
 	char datum[9];
 	
+	int in_zoznam=0;
 	int pozicia = 0;
 	double cislo;
 	printf("Nacitaj rodne cislo: ");
@@ -559,7 +561,12 @@ void function_p(FILE*ptr,char**pole_meno,char**pole_rodnecislo,char**pole_vysetr
 	for (int i = 0; i < pacienti; i++) {
 		if (strcmp(pole_rodnecislo[i], rodnecislo) == 0) {
 			pozicia = i;
+			in_zoznam = 1;
 		}
+	}
+	if (in_zoznam == 0) {
+		printf("pacient s rodnym cislo %s nieje v zozname!\n", rodnecislo);
+		return 0;
 	}
 	
 	// UKLADA DO DYNAMICKEHO POLA
@@ -585,34 +592,54 @@ void function_p(FILE*ptr,char**pole_meno,char**pole_rodnecislo,char**pole_vysetr
 	}
 	fclose(tempfile);
 	fclose(ptr);
+	
 	//PREPIS SUBORU A ODSTRANENIE docasneho Suboru
 	rename("pacienti.txt", "tempfile1.txt");
 	rename("tempfile.txt", "pacienti.txt");
 	rename("tempfile1.txt", "tempfile.txt");
 	remove("tempfile.txt");
 
+	printf("Pacientovi s rodnym cislom %s bol zmeneny vysledok\nvysetrenia %s z povodnej hodnoty %.7g na novu hodnotu %s\n", rodnecislo, vysetrenie, cislo, pole_vysledok[pozicia]);
 	
-	
-
-
-	
-	
-
-	
-	
-	printf("Pacientovi s rodnym cislom %s bol zmeneny vysledok\nvysetrenia %s z povodnej hodnoty %g na novu hodnotu %s\n", rodnecislo, vysetrenie, cislo, pole_vysledok[pozicia]);
-	//free(old);
 }
 
 
-void function_z() {
 
-	int datum1;
-	int datum2;
-	printf("1. Datum: ");
-	scanf("%d", &datum1);
-	printf("2. Datum: ");
-	scanf("%d", &datum2);
+//VYPIS 3 NAJVACSICH VYSLEDKOV
+void function_z(int pacienti, char** pole_datum, char** pole_vysetrenie, char** pole_vysledok){
+
+	char datum1[100];
+	char datum2[100];
+	char vysetrenie[100]; 
+	printf("Nacitaj 1. datum vo formate rrrrmmdd: ");
+	scanf("%s", datum1);
+	printf("Nacitaj 2. datum vo formate rrrrmmdd: ");
+	scanf("%s", datum2);
+	printf("Nacitaj vysetrenie: ");
+	scanf("%s", vysetrenie);
+
+	int date1 = atoi(datum1);
+	int date2 = atoi(datum2);
+	printf("%d\n", date1);
+	printf("%d\n", date2);
+	printf("%d\n", pacienti);
+	
+	int pozicia = 0;
+	
+	
+	char** vysledky = calloc(pacienti, sizeof(char*));
+	for (int i = 0; i < pacienti; i++) {
+		//printf("pole : %d , date1: %d , date2: %d\n", atoi(pole_datum[i]), date1, date2);
+		if (date1 <= atoi(pole_datum[i]) && atoi(pole_datum[i]) <= date2) {
+			vysledky[pozicia] = calloc(10, sizeof(char));
+			strcpy(vysledky[pozicia], (*pole_vysledok)[i]);
+			pozicia++;
+			printf("%s\n", vysledky[pozicia]);
+		}
+	}
+	
+	
+	
 
 }
 
@@ -650,7 +677,7 @@ int main() {
 			function_p(file,pole_meno,pole_rodnecislo,pole_vysetrenie,pole_datum,pole_vysledok,pacienti,pocet_riadkov);
 		}
 		if (input == 'z') {
-			function_z();
+			function_z(pacienti,pole_datum,pole_vysetrenie,pole_vysledok);
 		}
 		if (input == 'k'){
 			for (int i = 0; i < pacienti; i++) {
