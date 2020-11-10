@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+Ôªø#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,7 +19,7 @@ void function_v(int* pacienti,FILE** ptr,int *pocet_riadkov) {
 			(*pocet_riadkov) = (*pocet_riadkov) + 1;
 		}
 		int x;
-		x = (*pocet_riadkov);								//x = lokalna premenna pre nasledujuci for aby nsa zachovala premenn· "pocet_riadkov"
+		x = (*pocet_riadkov);								//x = lokalna premenna pre nasledujuci for aby nsa zachovala premenn√° "pocet_riadkov"
 		for (x; x > 0; x = x - 7) {						// zistenie poctu pacientov
 			(*pacienti) = (*pacienti) + 1;
 		}
@@ -75,15 +75,15 @@ void function_v(int* pacienti,FILE** ptr,int *pocet_riadkov) {
 			printf("Diagnoza: %s", buff);
 			int dia = atoi(buff);
 			if (strlen(buff) != 4) {
-				printf("###### - Nekorektne zadany vstup Diagnoza - #######\n\n");
+				printf("###### - Nekorektne zadany vstup Diagnoza1 - #######\n\n");
 				korektnost++;
 			}
-			else if (buff[0] <= 'A' || buff[0] >= 'Z') {
-				printf("###### - Nekorektne zadany vstup Diagnoza - #######\n\n");
+			else if (buff[0] < 'A' || buff[0] > 'Z') {
+				printf("###### - Nekorektne zadany vstup Diagnoza2 - #######\n\n");
 				korektnost++;
 			}
 			else if (dia > 99) {
-				printf("###### - Nekorektne zadany vstup Diagnoza - #######\n\n");
+				printf("###### - Nekorektne zadany vstup Diagnoza3 - #######\n\n");
 				korektnost++;
 			}
 
@@ -150,6 +150,7 @@ void function_v(int* pacienti,FILE** ptr,int *pocet_riadkov) {
 	printf("\n------------------- KONIEC ZAZNAMOV -------------------\n");
 
 	if (korektnost > 0) {
+		printf("Niektore zapisy boli zadane nekoretkne\n");
 		exit(1);
 	}
 
@@ -186,20 +187,20 @@ void function_o(FILE*file) {
 	
 	fseek(file, 0, SEEK_SET);	// nastavenie sa v subore na zaciatok.
 	int x;
-	x = pocet_riadkov;		//x = lokalna premenna pre nasledujuci for aby nsa zachovala premenn· "pocet_riadkov"
+	x = pocet_riadkov;		//x = lokalna premenna pre nasledujuci for aby nsa zachovala premenn√° "pocet_riadkov"
 	
 	//POCET PACIENTOV
 	for (x; x > 0; x = x - 7) {						// zistenie poctu pacientov
 		pacienti++;
 	}
 
-	//ALOKUJ premennÈ datumov a diagnoz
+	//ALOKUJ premenn√© datumov a diagnoz
 	char** pole_datum_o, ** pole_diagnoza_o;
 
 	pole_diagnoza_o = calloc(pacienti, sizeof(char*));
 	pole_datum_o = calloc(pacienti, sizeof(char*));
 
-	// VLOZENIE DIAGNOZ A DATUMOV DO POLÕ
+	// VLOZENIE DIAGNOZ A DATUMOV DO POL√ç
 	for (int i = 0; i < pacienti; i++) {
 		fgets(buff, sizeof(buff), file);					//Meno priezvisko
 		fgets(buff, sizeof(buff), file);					//Rodne cislo
@@ -276,7 +277,7 @@ void function_o(FILE*file) {
 void function_n(FILE* file, char*** pole_meno, char*** pole_rodnecislo, char*** pole_diagnoza, char*** pole_vysetrenie, char*** pole_vysledok, char*** pole_datum) {
 	
 	if (file == NULL) {
-		printf("Neotvoril sa subor , subor sa otvori stlacenÌm v\n");
+		printf("Neotvoril sa subor , subor sa otvori stlacen√≠m v\n");
 		return;
 	}
 	char buff[100];
@@ -288,7 +289,7 @@ void function_n(FILE* file, char*** pole_meno, char*** pole_rodnecislo, char*** 
 	fseek(file, 0, SEEK_SET);					 // nastavenie sa v subore na zaciatok.
 	int x;
 	x = pocet_riadkov;
-	int pacienti = 0;					//x = lokalna premenna pre nasledujuci for aby nsa zachovala premenn· "pocet_riadkov"
+	int pacienti = 0;					//x = lokalna premenna pre nasledujuci for aby nsa zachovala premenn√° "pocet_riadkov"
 	for (x; x > 0; x = x - 7) {						// zistenie poctu pacientov
 		pacienti ++;
 	}
@@ -394,6 +395,7 @@ void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
 		printf("Polia niesu Vytvorene - alokuj stalcenim n\n");
 		return;
 	}
+	int pocetpac = pacienti;
 	char diagnoza[4] = {""};
 	printf("Zadaj Diagnozu: ");
 	scanf("%s", diagnoza);
@@ -404,13 +406,13 @@ void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
 	int roknarodenia=0;
 	int pocet_m = 0;
 	int pocet_z = 0;
-	//vek muzov a zien uklada do polÌ
-	for (int i = 0; i < pacienti; i++) {
+	//vek muzov a zien uklada do pol√≠
+	for (int i = 0; i < pocetpac; i++) {
 		if (strcmp(diagnoza, pole_diagnoza[i]) == 0) {
 			int desiatky = ((pole_rodnecislo[i])[0] - '0') * 10 + ((pole_rodnecislo[i])[1] - '0') * 1;
 			pohlavie = ((pole_rodnecislo[i])[2] - '0');				//ZENY MAJU V RODNOM CISLE PRI MESIACOCH +50 takze staci desiatky poziret
 
-			if (desiatky < 20) {					//ZISTOVANIE »I narodeny v rokoch 2000 alebo 1900
+			if (desiatky < 20) {					//ZISTOVANIE ƒåI narodeny v rokoch 2000 alebo 1900
 				roknarodenia = 2000 + desiatky;
 			}
 			else {
@@ -434,14 +436,44 @@ void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
 	printf("Pocet zien s %s: %d\n", diagnoza, pocet_z);
 	printf("\n");
 
+
+	//BUBBLE SORT MUZOV
+	int i1, j1, temp1;
+	for (i1 = 0; i1 < (pocet_m - 1); ++i1)
+	{
+		for (j1 = 0; j1 < pocet_m - 1 - i1; ++j1)
+		{
+			if (vek_m[j1] > vek_m[j1 + 1])
+			{
+				temp1 = vek_m[j1 + 1];
+				vek_m[j1 + 1] = vek_m[j1];
+				vek_m[j1] = temp1;
+			}
+		}
+	}
+
+	//BUBBLE SORT ZIEN
+	int i2, j2, temp2;
+	for (i2 = 0; i2 < (pocet_z - 1); ++i2)
+	{
+		for (j2 = 0; j2 < pocet_z - 1 - i2; ++j2)
+		{
+			if (vek_z[j2] > vek_z[j2 + 1])
+			{
+				temp2 = vek_z[j2 + 1];
+				vek_z[j2 + 1] = vek_z[j2];
+				vek_z[j2] = temp2;
+			}
+		}
+	}
+
 	//VYPIS MUZOV
 	printf("Muzi:\n");
 	for (int i = 0; i < 1; i++) {
 		int Freq[100];
 		int Count;
-		for (int i = 0; i < pocet_m; i++)
-		{
-			Count = 1;								//Vûdy je jeden prvok
+		for (int i = 0; i < pocet_m; i++){
+			Count = 1;								//V¬ûdy je jeden prvok
 			for (int j = i + 1; j < pocet_m; j++)
 			{
 				if (vek_m[i] == vek_m[j])
@@ -450,7 +482,7 @@ void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
 					Freq[j] = 0;		// Ak sa rovna tak nanho nastav nulu
 				}
 			}
-			if (Freq[i] != 0)			// Ak Freq[i] == 0  --> Tento prvok uû  bol zaratan˝...... pozri koment·r o jedno vyssie
+			if (Freq[i] != 0)			// Ak Freq[i] == 0  --> Tento prvok u¬û  bol zaratan√Ω...... pozri koment√°r o jedno vyssie
 			{
 				Freq[i] = Count;		// Ak Freq[i] != 0 ---> Tak prirad pocet 
 			}
@@ -472,7 +504,7 @@ void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
 		int Count;
 		for (int i = 0; i < pocet_z; i++)
 		{
-			Count = 1;								//Vûdy je jedne prvok
+			Count = 1;								//V¬ûdy je jedne prvok
 			for (int j = i + 1; j < pocet_z; j++)
 			{
 				if (vek_z[i] == vek_z[j])
@@ -481,7 +513,7 @@ void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
 					Freq[j] = 0;		// Ak sa rovna tak nanho nastav nulu
 				}
 			}
-			if (Freq[i] != 0)			// Ak Freq[i] == 0  --> Tento prvok uû  bol zaratan˝...... pozri koment·r o jedno vyssie
+			if (Freq[i] != 0)			// Ak Freq[i] == 0  --> Tento prvok u¬û  bol zaratan√Ω...... pozri koment√°r o jedno vyssie
 			{
 				Freq[i] = Count;		// Ak Freq[i] != 0 ---> Tak prirad pocet 
 			}
@@ -575,7 +607,12 @@ void function_p(FILE*ptr,char**pole_meno,char**pole_rodnecislo,char**pole_vysetr
 
 void function_z() {
 
-
+	int datum1;
+	int datum2;
+	printf("1. Datum: ");
+	scanf("%d", &datum1);
+	printf("2. Datum: ");
+	scanf("%d", &datum2);
 
 }
 
@@ -612,7 +649,7 @@ int main() {
 		if (input == 'p') {
 			function_p(file,pole_meno,pole_rodnecislo,pole_vysetrenie,pole_datum,pole_vysledok,pacienti,pocet_riadkov);
 		}
-		if (input == 'p') {
+		if (input == 'z') {
 			function_z();
 		}
 		if (input == 'k'){
