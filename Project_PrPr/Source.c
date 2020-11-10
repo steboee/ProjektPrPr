@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define NO_WARNINGS
+
 
 
 //VYPIS ZO SUBORU
@@ -168,7 +170,7 @@ void function_o(FILE*file) {
 	char inputdatum[100];
 	printf("Nacitaj datum vo formate rrrrmmdd: ");
 	scanf("%s", inputdatum);
-	
+	inputdatum[strlen(inputdatum)] = '\0';
 	if (strlen(inputdatum) > 8) {
 		printf("###### - Nekoretny vstup - ######\n");
 		return;
@@ -566,7 +568,7 @@ void function_p(FILE*ptr,char**pole_meno,char**pole_rodnecislo,char**pole_vysetr
 	}
 	if (in_zoznam == 0) {
 		printf("pacient s rodnym cislo %s nieje v zozname!\n", rodnecislo);
-		return 0;
+		return;
 	}
 	
 	// UKLADA DO DYNAMICKEHO POLA
@@ -606,37 +608,108 @@ void function_p(FILE*ptr,char**pole_meno,char**pole_rodnecislo,char**pole_vysetr
 
 
 //VYPIS 3 NAJVACSICH VYSLEDKOV
-void function_z(int pacienti, char** pole_datum, char** pole_vysetrenie, char** pole_vysledok){
-
+void function_z(int pacienti, char** pole_datum, char** pole_vysetrenie, char** pole_vysledok,char**pole_meno){
+	if (pole_datum == NULL || pole_vysetrenie == NULL || pole_vysledok == NULL || pole_meno == NULL) {
+		printf("Polia niesu Vytvorene - alokuj stalcenim n\n");
+		return;
+	}
+	puts("");
+	printf("------------------- FUNKCIA Z  -------------------\n");
 	char datum1[100];
 	char datum2[100];
 	char vysetrenie[100]; 
 	printf("Nacitaj 1. datum vo formate rrrrmmdd: ");
 	scanf("%s", datum1);
+	if (strlen(datum1) != 8) {
+		printf("Nekorektny datum!\nNacitaj novu funkciu \n");
+		return;
+	}
+	datum1[strlen(datum1)] = '\0';
 	printf("Nacitaj 2. datum vo formate rrrrmmdd: ");
 	scanf("%s", datum2);
-	printf("Nacitaj vysetrenie: ");
-	scanf("%s", vysetrenie);
+	if (strlen(datum2) != 8) {
+		printf("Nekorektny datum!\nNacitaj novu funkciu \n");
+		return;
+	}
+	datum2[strlen(datum1)] = '\0';
 
 	int date1 = atoi(datum1);
 	int date2 = atoi(datum2);
-	printf("%d\n", date1);
-	printf("%d\n", date2);
-	printf("%d\n", pacienti);
+	if (date1 > date2) {
+		printf("Koncovy datum sa nachadza pred pociatocnym datumom\n");
+		printf("Nacitaj funkciu\n");
+		return;
+	}
+	printf("Nacitaj vysetrenie: ");
+	scanf("%s", vysetrenie);
+
 	
+	
+
 	int pozicia = 0;
 	
 	
-	char** vysledky = calloc(pacienti, sizeof(char*));
+	char** vysledky, ** vysetrenia,**mena;
+	vysledky = calloc(pacienti, sizeof(char*));
+	vysetrenia = calloc(pacienti, sizeof(char*));
+	mena = calloc(pacienti, sizeof(char*));
+
+	//pozeram na datum a beriem vysledky pacinetov v rozmedzi 2 datumov do noveho pola
 	for (int i = 0; i < pacienti; i++) {
-		//printf("pole : %d , date1: %d , date2: %d\n", atoi(pole_datum[i]), date1, date2);
 		if (date1 <= atoi(pole_datum[i]) && atoi(pole_datum[i]) <= date2) {
 			vysledky[pozicia] = calloc(10, sizeof(char));
-			strcpy(vysledky[pozicia], (*pole_vysledok)[i]);
+			vysetrenia[pozicia] = calloc(50, sizeof(char));
+			mena[pozicia] = calloc(100, sizeof(char));
+			strcpy(vysledky[pozicia],pole_vysledok[i]);
+			strcpy(vysetrenia[pozicia],pole_vysetrenie[i]);
+			strcpy(mena[pozicia], pole_meno[i]);
 			pozicia++;
-			printf("%s\n", vysledky[pozicia]);
 		}
 	}
+
+	double max1 = 0, max2 = 0, max3 = 0;
+	int meno1=0, meno2=0, meno3=0;
+	int dia_je_v_zozname = 0;
+	for (int i = 0; i <pozicia; i++) {
+		if (strcmp(vysetrenia[i], vysetrenie) == 0) {
+			dia_je_v_zozname = 1;
+			if (atof(vysledky[i]) > max1) {
+				max2 = max1;
+				meno2 = meno1;
+				max1 = atof(vysledky[i]);
+				meno1 = i;
+			
+			}
+			else if (atof(vysledky[i]) > max2) {
+				max3 = max2;
+				meno3 = meno2;
+				max2 = atof(vysledky[i]);
+				meno2 = i;
+				
+			}
+			else if (atof(vysledky[i]) > max3) {
+				max3 = atof(vysledky[i]);
+				meno3 = i;
+				
+			}
+			
+		}
+	}
+	if (dia_je_v_zozname == 1) {
+		puts("");
+		printf("Traja pacienti s najvyssimi hodnotami ASLO za obdobie %s - %s su (namerana hodnota v zatvorke):\n", datum1, datum2);
+		printf("%s (%s)\n", mena[meno1], vysledky[meno1]);
+		printf("%s (%s)\n", mena[meno2], vysledky[meno2]);
+		printf("%s (%s)\n", mena[meno3], vysledky[meno3]);
+	}
+	else {
+		printf("Diagnoza nieje v zonzame!\n");
+		return;
+	}
+	puts("");
+	printf("------------------- FUNKCIA Z  -------------------\n");
+	
+
 	
 	
 	
@@ -677,7 +750,7 @@ int main() {
 			function_p(file,pole_meno,pole_rodnecislo,pole_vysetrenie,pole_datum,pole_vysledok,pacienti,pocet_riadkov);
 		}
 		if (input == 'z') {
-			function_z(pacienti,pole_datum,pole_vysetrenie,pole_vysledok);
+			function_z(pacienti,pole_datum,pole_vysetrenie,pole_vysledok,pole_meno);
 		}
 		if (input == 'k'){
 			for (int i = 0; i < pacienti; i++) {
