@@ -7,6 +7,7 @@
 //VYPIS ZO SUBORU
 void function_v(int* pacienti,FILE** ptr,int *pocet_riadkov) {
 	*ptr = fopen("pacienti.txt", "r");
+	
 	if (*ptr == NULL) {
 		printf("NEPODARILO SA OTVORIT SUBOR");
 		exit(1);
@@ -148,11 +149,12 @@ void function_v(int* pacienti,FILE** ptr,int *pocet_riadkov) {
 
 	}
 	printf("\n------------------- KONIEC ZAZNAMOV -------------------\n");
-
+	
 	if (korektnost > 0) {
 		printf("Niektore zapisy boli zadane nekoretkne\n");
 		exit(1);
 	}
+	
 
 }
 
@@ -337,11 +339,11 @@ void function_n(FILE* file, char*** pole_meno, char*** pole_rodnecislo, char*** 
 
 		(*pole_vysledok)[i] = calloc(55, sizeof(char));
 		fgets((*pole_vysledok)[i], 50, file);
-		//(*pole_vysledok)[i][strlen((*pole_vysledok)[i]) - 1] = '\0';				//na posledne miesto kde je obycajne \n da znak \0
+		(*pole_vysledok)[i][strlen((*pole_vysledok)[i]) - 1] = '\0';				//na posledne miesto kde je obycajne \n da znak \0
 
 		(*pole_datum)[i] = calloc(50, sizeof(char));
 		fgets((*pole_datum)[i], 50, file);
-		(*pole_vysledok)[i][strlen((*pole_vysledok)[i]) - 1] = '\0';				//na posledne miesto kde je obycajne \n da znak \0
+		(*pole_datum)[i][strlen((*pole_datum)[i]) - 1] = '\0';				//na posledne miesto kde je obycajne \n da znak \0
 
 		fgets(buff, sizeof(buff), file);
 	}
@@ -560,8 +562,15 @@ void function_p(FILE*ptr,char**pole_meno,char**pole_rodnecislo,char**pole_vysetr
 	scanf("%s", &datum);
 	for (int i = 0; i < pacienti; i++) {
 		if (strcmp(pole_rodnecislo[i], rodnecislo) == 0) {
-			pozicia = i;
-			in_zoznam = 1;
+			
+			if (strcmp(pole_vysetrenie[i], vysetrenie) == 0) {
+				
+				if (strcmp(pole_datum[i], datum) == 0){
+					
+					pozicia = i;
+					in_zoznam = 1; //pre zistenie ci pacient s danym rodnym cislom, vysetrenim obl vysetreovany v danom datume
+				}
+			}
 		}
 	}
 	if (in_zoznam == 0) {
@@ -598,6 +607,7 @@ void function_p(FILE*ptr,char**pole_meno,char**pole_rodnecislo,char**pole_vysetr
 	rename("tempfile.txt", "pacienti.txt");
 	rename("tempfile1.txt", "tempfile.txt");
 	remove("tempfile.txt");
+	ptr = fopen("pacienti.txt", "r");
 
 	printf("Pacientovi s rodnym cislom %s bol zmeneny vysledok\nvysetrenia %s z povodnej hodnoty %.7g na novu hodnotu %s\n", rodnecislo, vysetrenie, cislo, pole_vysledok[pozicia]);
 	
@@ -672,6 +682,8 @@ void function_z(int pacienti, char** pole_datum, char** pole_vysetrenie, char** 
 		if (strcmp(vysetrenia[i], vysetrenie) == 0) {
 			dia_je_v_zozname = 1;
 			if (atof(vysledky[i]) > max1) {
+				max3 = max2;
+				meno3 = meno2;
 				max2 = max1;
 				meno2 = meno1;
 				max1 = atof(vysledky[i]);
@@ -699,11 +711,29 @@ void function_z(int pacienti, char** pole_datum, char** pole_vysetrenie, char** 
 		printf("%s (%s)\n", mena[meno1], vysledky[meno1]);
 		printf("%s (%s)\n", mena[meno2], vysledky[meno2]);
 		printf("%s (%s)\n", mena[meno3], vysledky[meno3]);
+		for (int i = 0; i < pozicia; i++) {
+			free(vysledky[i]);
+			free(vysetrenia[i]);
+			free(mena[i]);
+		}
+		free(vysledky);
+		free(vysetrenia);
+		free(mena);
 	}
 	else {
 		printf("Diagnoza nieje v zonzame!\n");
+		for (int i = 0; i < pozicia; i++) {
+			free(vysledky[i]);
+			free(vysetrenia[i]);
+			free(mena[i]);
+		}
+		free(vysledky);
+		free(vysetrenia);
+		free(mena);
 		return;
 	}
+
+
 	puts("");
 	printf("------------------- FUNKCIA Z  -------------------\n");
 	
@@ -727,6 +757,8 @@ int main() {
 	printf("n: Alokuje dynamicke polia pre polozky v zozname a vlozi zaznamy\n");
 	printf("s: Nacita na zaklade rodneho cisla udaje o pacientovi\n");
 	printf("h: Vypise histogram pre danu diagnozu\n");
+	printf("p: Prepise vysledok v alokovanom poli aj v txt subore\n");
+	printf("z: Vypise 3 pacientov s najvyssimi hodnotami\n");
 	puts("");
 	while (scanf("%c", &input)) {
 		if (input == 'v') {
@@ -751,20 +783,28 @@ int main() {
 			function_z(pacienti,pole_datum,pole_vysetrenie,pole_vysledok,pole_meno);
 		}
 		if (input == 'k'){
-			for (int i = 0; i < pacienti; i++) {
-				free((pole_meno)[i]);
-				free((pole_rodnecislo)[i]);
-				free((pole_diagnoza)[i]);
-				free((pole_vysetrenie)[i]);
-				free((pole_vysledok)[i]);
-				free((pole_datum)[i]);
+			if (pole_meno != NULL) {
+				for (int i = 0; i < pacienti; i++) {
+					free((pole_meno)[i]);
+					free((pole_rodnecislo)[i]);
+					free((pole_diagnoza)[i]);
+					free((pole_vysetrenie)[i]);
+					free((pole_vysledok)[i]);
+					free((pole_datum)[i]);
+				}
+				free(pole_meno);
+				free(pole_rodnecislo);
+				free(pole_diagnoza);
+				free(pole_vysetrenie);
+				free(pole_vysledok);
+				free(pole_datum);
 			}
-			free(pole_meno);
-			free(pole_rodnecislo);
-			free(pole_diagnoza);
-			free(pole_vysetrenie);
-			free(pole_vysledok);
-			free(pole_datum);
+			if (file != NULL) {
+			
+				fclose(file);
+				file = NULL;
+			}
+			
 			exit(1);
 		}
 		
