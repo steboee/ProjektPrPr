@@ -440,7 +440,7 @@ void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
 
 
 	//BUBBLE SORT MUZOV
-	int i1, j1, temp1;
+	int i1, j1, temp1;						//temp1 - dočasná premenná , aby mi neprepisovalo vek_m
 	for (i1 = 0; i1 < (pocet_m - 1); ++i1)
 	{
 		for (j1 = 0; j1 < pocet_m - 1 - i1; ++j1)
@@ -455,7 +455,7 @@ void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
 	}
 
 	//BUBBLE SORT ZIEN
-	int i2, j2, temp2;
+	int i2, j2, temp2;						//temp2 - dočasná premenná , aby mi neprepisovalo vek_z[na nejakej pozicii]
 	for (i2 = 0; i2 < (pocet_z - 1); ++i2)
 	{
 		for (j2 = 0; j2 < pocet_z - 1 - i2; ++j2)
@@ -471,25 +471,25 @@ void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
 
 	//VYPIS MUZOV
 	printf("Muzi:\n");
-	for (int i = 0; i < 1; i++) {
+	for (int i = 0; i < 1; i++) { // Kvoli lokalnym premenným
 		int Freq[100];
 		int Count;
-		for (int i = 0; i < pocet_m; i++){
-			Count = 1;								//Vdy je jeden prvok
+		for (int i = 0; i < pocet_m; i++){				//pocet_m --> pocet muzov s diagnozou
+			Count = 1;									//pocitadlo je 1 lebo sa zacal cyklus čiže ---> pocet_m !=0
 			for (int j = i + 1; j < pocet_m; j++)
 			{
 				if (vek_m[i] == vek_m[j])
 				{
 					Count++;			// pocet sa zvysi o 1 ak sa nasiel taky isty vek
-					Freq[j] = 0;		// Ak sa rovna tak nanho nastav nulu
+					Freq[j] = 0;	
 				}
 			}
-			if (Freq[i] != 0)			// Ak Freq[i] == 0  --> Tento prvok u  bol zarataný...... pozri komentár o jedno vyssie
+			if (Freq[i] != 0)			// Ak Freq[i] == 0  --> Tento prvok už  bol zarataný...... pozri komentár o jedno vyssie
 			{
 				Freq[i] = Count;		// Ak Freq[i] != 0 ---> Tak prirad pocet 
 			}
 		}
-		for (int i = 0; i < pocet_m; i++)		//Vypis pre muzov ktory maju danu diagnozu , pocet_z --> pocet muzov so zadanou diagnozou 
+		for (int i = 0; i < pocet_m; i++)		//Vypis pre muzov ktory maju danu diagnozu , pocet_m --> pocet muzov so zadanou diagnozou 
 		{
 			if (Freq[i] != 0)				// Ak Freq[i] == 0 ---> Tak tento prvok uz som vypisal 
 			{
@@ -503,10 +503,9 @@ void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
 	printf("Zeny:\n");
 	for (int i = 0; i < 1; i++) {
 		int Freq[100];
-		int Count;
-		for (int i = 0; i < pocet_z; i++)
-		{
-			Count = 1;								//Vdy je jedne prvok
+		int Count;									
+		for (int i = 0; i < pocet_z; i++){
+			Count = 1;										//pocitadlo je 1 lebo sa zacal cyklus čiže ---> pocet_z !=0
 			for (int j = i + 1; j < pocet_z; j++)
 			{
 				if (vek_z[i] == vek_z[j])
@@ -534,7 +533,7 @@ void function_h(char** pole_rodnecislo,char**pole_diagnoza,int pacienti) {
 
 
 
-//PREPIS UDAJU
+//PREPIS UDAJoV
 void function_p(FILE*ptr,char**pole_meno,char**pole_rodnecislo,char**pole_vysetrenie,char**pole_datum,char**pole_vysledok,int pacienti,int pocet_riadkov) {
 
 	if (pole_rodnecislo == NULL) {
@@ -561,11 +560,11 @@ void function_p(FILE*ptr,char**pole_meno,char**pole_rodnecislo,char**pole_vysetr
 	printf("Nacitaj datum vysetrenia: ");
 	scanf("%s", &datum);
 	for (int i = 0; i < pacienti; i++) {
-		if (strcmp(pole_rodnecislo[i], rodnecislo) == 0) {
+		if (strcmp(pole_rodnecislo[i], rodnecislo) == 0) {			//Ak sa rovna rodne cisla vnor sa dalej 
 			
-			if (strcmp(pole_vysetrenie[i], vysetrenie) == 0) {
+			if (strcmp(pole_vysetrenie[i], vysetrenie) == 0) {		//Ak sa rovna rodne cislo aj vysetrenie vnor sa dalej
 				
-				if (strcmp(pole_datum[i], datum) == 0){
+				if (strcmp(pole_datum[i], datum) == 0){				//Ak sa rovnaju vsetky tak uloz danu poziciu do pozicia
 					
 					pozicia = i;
 					in_zoznam = 1; //pre zistenie ci pacient s danym rodnym cislom, vysetrenim obl vysetreovany v danom datume
@@ -573,7 +572,7 @@ void function_p(FILE*ptr,char**pole_meno,char**pole_rodnecislo,char**pole_vysetr
 			}
 		}
 	}
-	if (in_zoznam == 0) {
+	if (in_zoznam == 0) {				//V pripade ak pacient s takymi parametrami nebol najdeny v zozname
 		printf("pacient s rodnym cislo %s nieje v zozname!\n", rodnecislo);
 		return;
 	}
@@ -585,6 +584,7 @@ void function_p(FILE*ptr,char**pole_meno,char**pole_rodnecislo,char**pole_vysetr
 
 	int replace_line = ((pozicia + 1) * 7) - 2;
 	int line = 1;
+
 	fseek(ptr, 0, SEEK_SET); //nastavenie na zaciatok file
 	char string[100];
 	
@@ -743,6 +743,7 @@ void function_z(int pacienti, char** pole_datum, char** pole_vysetrenie, char** 
 	
 
 }
+
 
 
 int main() {
