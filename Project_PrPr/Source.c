@@ -662,7 +662,7 @@ void function_z(int pacienti, char** pole_datum, char** pole_vysetrenie, char** 
 	vysetrenia = calloc(pacienti, sizeof(char*));
 	mena = calloc(pacienti, sizeof(char*));
 
-	//pozeram na datum a beriem vysledky pacinetov v rozmedzi 2 datumov do noveho pola
+	//pozeram na datum a beriem vysledky pacientov v rozmedzi 2 datumov do noveho pola
 	for (int i = 0; i < pacienti; i++) {
 		if (date1 <= atoi(pole_datum[i]) && atoi(pole_datum[i]) <= date2) {
 			vysledky[pozicia] = calloc(10, sizeof(char));
@@ -676,11 +676,11 @@ void function_z(int pacienti, char** pole_datum, char** pole_vysetrenie, char** 
 	}
 
 	double max1 = 0, max2 = 0, max3 = 0;
-	int meno1=0, meno2=0, meno3=0;
+	int meno1=NULL, meno2=NULL, meno3 = NULL;
 	int dia_je_v_zozname = 0;
 	for (int i = 0; i <pozicia; i++) {
 		if (strcmp(vysetrenia[i], vysetrenie) == 0) {
-			dia_je_v_zozname = 1;
+			dia_je_v_zozname++;
 			if (atof(vysledky[i]) > max1) {
 				max3 = max2;
 				meno3 = meno2;
@@ -706,6 +706,33 @@ void function_z(int pacienti, char** pole_datum, char** pole_vysetrenie, char** 
 		}
 	}
 	if (dia_je_v_zozname == 1) {
+		puts("");
+		printf("Traja pacienti s najvyssimi hodnotami ASLO za obdobie %s - %s su (namerana hodnota v zatvorke):\n", datum1, datum2);
+		printf("%s (%s)\n", mena[meno1], vysledky[meno1]);
+		for (int i = 0; i < pozicia; i++) {
+			free(vysledky[i]);
+			free(vysetrenia[i]);
+			free(mena[i]);
+		}
+		free(vysledky);
+		free(vysetrenia);
+		free(mena);
+	}
+	else if (dia_je_v_zozname == 2) {
+		puts("");
+		printf("Traja pacienti s najvyssimi hodnotami ASLO za obdobie %s - %s su (namerana hodnota v zatvorke):\n", datum1, datum2);
+		printf("%s (%s)\n", mena[meno1], vysledky[meno1]);
+		printf("%s (%s)\n", mena[meno2], vysledky[meno2]);
+		for (int i = 0; i < pozicia; i++) {
+			free(vysledky[i]);
+			free(vysetrenia[i]);
+			free(mena[i]);
+		}
+		free(vysledky);
+		free(vysetrenia);
+		free(mena);
+	}
+	else if (dia_je_v_zozname >=3) {
 		puts("");
 		printf("Traja pacienti s najvyssimi hodnotami ASLO za obdobie %s - %s su (namerana hodnota v zatvorke):\n", datum1, datum2);
 		printf("%s (%s)\n", mena[meno1], vysledky[meno1]);
